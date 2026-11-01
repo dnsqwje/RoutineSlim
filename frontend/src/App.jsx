@@ -1,28 +1,26 @@
+import { LoginPage } from "./features/auth";
+import { DashboardPage } from "./features/dashboard";
+import {
+  SubscriptionListPage,
+  FreeTrialPage,
+  SubscriptionComparisonPage,
+  SubscriptionDetailPage,
+} from "./features/subscriptions";
+import { PaymentHistoryPage, PaymentCalendarPage } from "./features/payments";
+import { CommunityPage, CommunityActivityPage } from "./features/community";
+import { SavingsAnalysisPage, BudgetPage, SavingsGoalPage } from "./features/savings";
+import { ProfilePage } from "./features/account";
+import { SpendingInsightsPage, MonthlyReportPage } from "./features/reports";
+import { ReminderSettingsPage, NotificationCenterPage } from "./features/notifications";
+import { SupportCenterPage, AboutPage } from "./features/support";
+import { AdminPage } from "./features/admin";
+import * as authApi from "./features/auth/api/authApi";
+import * as adminApi from "./features/admin/api/adminApi";
+import * as notificationsApi from "./features/notifications/api/notificationsApi";
 import React, { useEffect, useState } from "react";
-import { apiRequest } from "./api/apiClient";
+
 import AppLayout from "./components/layout/AppLayout";
 import BrandLogo from "./components/common/BrandLogo";
-import LoginPage from "./features/auth/LoginPage";
-import DashboardPage from "./features/dashboard/DashboardPage";
-import SubscriptionListPage from "./features/subscriptions/SubscriptionListPage";
-import PaymentHistoryPage from "./features/payments/PaymentHistoryPage";
-import CommunityPage from "./features/community/CommunityPage";
-import PaymentCalendarPage from "./features/payments/PaymentCalendarPage";
-import SavingsAnalysisPage from "./features/savings/SavingsAnalysisPage";
-import BudgetPage from "./features/savings/BudgetPage";
-import ProfilePage from "./features/account/ProfilePage";
-import SpendingInsightsPage from "./features/reports/SpendingInsightsPage";
-import ReminderSettingsPage from "./features/notifications/ReminderSettingsPage";
-import FreeTrialPage from "./features/subscriptions/FreeTrialPage";
-import MonthlyReportPage from "./features/reports/MonthlyReportPage";
-import SubscriptionComparisonPage from "./features/subscriptions/SubscriptionComparisonPage";
-import SavingsGoalPage from "./features/savings/SavingsGoalPage";
-import CommunityActivityPage from "./features/community/CommunityActivityPage";
-import SupportCenterPage from "./features/support/SupportCenterPage";
-import NotificationCenterPage from "./features/notifications/NotificationCenterPage";
-import SubscriptionDetailPage from "./features/subscriptions/SubscriptionDetailPage";
-import AboutPage from "./features/support/AboutPage";
-import AdminPage from "./features/admin/AdminPage";
 const keys = new Set([
   "dashboard",
   "subscriptions",
@@ -72,7 +70,8 @@ export default function App() {
   }
   useEffect(() => {
     let active = true;
-    apiRequest("/api/me")
+    authApi
+      .getSession()
       .then((v) => {
         if (active) setUser(v.id);
       })
@@ -102,7 +101,8 @@ export default function App() {
     setAdmin(false);
     if (!user) return;
     setCheckingAdmin(true);
-    apiRequest("/api/v1/community/moderation")
+    adminApi
+      .getModerationAccess()
       .then((v) => {
         if (active) setAdmin(v.admin);
       })
@@ -121,7 +121,8 @@ export default function App() {
     }
     let active = true;
     const update = () =>
-      apiRequest("/api/v1/notifications")
+      notificationsApi
+        .getNotifications()
         .then((items) => {
           if (active) setUnread(items.filter((x) => !x.read).length);
         })
@@ -137,7 +138,7 @@ export default function App() {
   }, [user, route.key]);
   async function logout() {
     try {
-      await apiRequest("/api/logout", { method: "POST" });
+      await authApi.logout();
       setUser(null);
       setAdmin(false);
       navigate("login");

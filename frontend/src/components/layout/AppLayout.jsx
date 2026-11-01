@@ -171,7 +171,10 @@ export default function AppLayout({
   const current =
     navigation.find((n) => n.key === page) ||
     (page === "subscription-detail" ? { label: "구독 상세" } : null);
-  const displayName = user || "회원";
+  const isMemberUuid =
+    typeof user === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(user);
+  const displayName = isMemberUuid ? "회원" : user || "회원";
   return (
     <div className="layout">
       <aside className="sidebar">

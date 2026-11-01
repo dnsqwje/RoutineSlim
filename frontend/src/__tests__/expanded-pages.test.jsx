@@ -1,15 +1,15 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor, cleanup, within } from "@testing-library/react";
-import FreeTrialPage from "../features/subscriptions/FreeTrialPage";
-import MonthlyReportPage from "../features/reports/MonthlyReportPage";
-import SubscriptionComparisonPage from "../features/subscriptions/SubscriptionComparisonPage";
-import SavingsGoalPage from "../features/savings/SavingsGoalPage";
-import SupportCenterPage from "../features/support/SupportCenterPage";
-import CommunityActivityPage from "../features/community/CommunityActivityPage";
-import NotificationCenterPage from "../features/notifications/NotificationCenterPage";
-import SubscriptionDetailPage from "../features/subscriptions/SubscriptionDetailPage";
+import FreeTrialPage from "../features/subscriptions/pages/FreeTrialPage";
+import MonthlyReportPage from "../features/reports/pages/MonthlyReportPage";
+import SubscriptionComparisonPage from "../features/subscriptions/pages/SubscriptionComparisonPage";
+import SavingsGoalPage from "../features/savings/pages/SavingsGoalPage";
+import SupportCenterPage from "../features/support/pages/SupportCenterPage";
+import CommunityActivityPage from "../features/community/pages/CommunityActivityPage";
+import NotificationCenterPage from "../features/notifications/pages/NotificationCenterPage";
+import SubscriptionDetailPage from "../features/subscriptions/pages/SubscriptionDetailPage";
 import App from "../App";
-import AdminPage from "../features/admin/AdminPage";
+import AdminPage from "../features/admin/pages/AdminPage";
 import BrandLogo from "../components/common/BrandLogo";
 import { apiRequest } from "../api/apiClient";
 vi.mock("../api/apiClient", () => ({

@@ -60,8 +60,8 @@ export function createRoutineSlimApiClient({
     if (!response.ok) {
       if ([401, 403].includes(response.status) && member) onUnauthorized(response.status);
       throw new RoutineSlimApiError(
-        typeof value?.message === "string"
-          ? value.message
+        typeof (value?.message || value?.detail) === "string"
+          ? value.message || value.detail
           : `서버 요청에 실패했습니다 (${response.status}).`,
         response.status,
       );

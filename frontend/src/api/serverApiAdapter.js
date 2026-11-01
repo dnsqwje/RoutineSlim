@@ -4,9 +4,10 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const SESSION_KEY = "routineslim.server-dev.member.v1";
 let memoryId = null;
 const unsupported = (path) => {
-  throw new Error(
-    `첨부 Server-dev에 이 기능의 API가 없습니다 (${path}). 원본 웹 API를 서버에 추가해야 합니다.`,
-  );
+  const error = new Error("현재 연결된 서버에서 이 기능을 지원하지 않습니다.");
+  error.code = "API_NOT_AVAILABLE";
+  error.endpoint = path;
+  throw error;
 };
 function categoryMap() {
   try {

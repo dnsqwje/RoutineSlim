@@ -1,6 +1,9 @@
-import { useAccountSetting } from "../../hooks/useAccountSetting";
+import * as reportsApi from "../../features/reports/api/reportsApi";
+import * as notificationsApi from "../../features/notifications/api/notificationsApi";
+import * as savingsApi from "../../features/savings/api/savingsApi";
+import { useAccountSetting } from "../../features/account/hooks/useAccountSetting";
 import React, { useEffect, useState } from "react";
-import { apiRequest, formatWon, getTodayDate } from "../../api/apiClient";
+import { formatWon, getTodayDate } from "../../api/apiClient";
 import CategorySpendingChart from "../charts/CategorySpendingChart";
 import ServiceBadge from "../common/ServiceBadge";
 export default function SpendingSummaryPanel({ page, user, navigate }) {
@@ -11,9 +14,9 @@ export default function SpendingSummaryPanel({ page, user, navigate }) {
     let active = true;
     function load() {
       Promise.all([
-        apiRequest("/api/v1/expenses/summary"),
-        apiRequest("/api/v1/reminders"),
-        apiRequest("/api/v1/savings/summary"),
+        reportsApi.getExpenseSummary(),
+        notificationsApi.getReminders(),
+        savingsApi.getSavingsSummary(),
       ])
         .then(([expense, reminders, savings]) => {
           if (active) {

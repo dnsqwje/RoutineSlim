@@ -79,3 +79,25 @@ it("exposes error status and network codes consistently across platforms", async
     code: "NETWORK_ERROR",
   });
 });
+
+it("shows Spring ProblemDetail errors without losing the HTTP status", async () => {
+  const client = createRoutineSlimApiClient({
+    getMemberId: () => MEMBER,
+    fetchImpl: vi.fn().mockResolvedValue({
+      ok: false,
+      status: 400,
+      text: async () =>
+        JSON.stringify({
+          type: "about:blank",
+          title: "Bad Request",
+          status: 400,
+          detail: "기준일을 확인해주세요.",
+        }),
+    }),
+  });
+  await expect(client.listSubscriptions()).rejects.toMatchObject({
+    message: "기준일을 확인해주세요.",
+    status: 400,
+    code: "HTTP_400",
+  });
+});

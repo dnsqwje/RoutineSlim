@@ -1,5 +1,7 @@
+import * as subscriptionsApi from "../../subscriptions/api/subscriptionsApi";
+import * as accountApi from "../api/accountApi";
 import React, { useState } from "react";
-import { apiRequest } from "../../../api/apiClient";
+
 export default function AccountDataBackup() {
   const [busy, setBusy] = useState(false),
     [message, setMessage] = useState(""),
@@ -8,7 +10,7 @@ export default function AccountDataBackup() {
     setBusy(true);
     setError("");
     try {
-      const subscriptions = await apiRequest("/api/v1/subscriptions");
+      const subscriptions = await subscriptionsApi.getSubscriptions();
       const blob = new Blob(
         [JSON.stringify({ format: "RoutineSlim", version: 1, subscriptions }, null, 2)],
         { type: "application/json" },
@@ -59,10 +61,7 @@ export default function AccountDataBackup() {
       )
         throw Error("올바른 구독 백업 파일이 아닙니다.");
       if (!confirm(`${items.length}개의 구독으로 현재 구독 목록을 교체할까요?`)) return;
-      await apiRequest("/api/data/subscriptions", {
-        method: "PUT",
-        body: { json: JSON.stringify(items) },
-      });
+      await accountApi.restoreSubscriptions(items);
       setMessage("구독을 복원했습니다. 구독 관리에서 확인할 수 있습니다.");
     } catch (e) {
       setError(e.message);

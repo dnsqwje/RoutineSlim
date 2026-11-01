@@ -1,8 +1,9 @@
+import * as subscriptionsApi from "../api/subscriptionsApi";
 import React, { useEffect, useState } from "react";
-import { apiRequest, getTodayDate } from "../../../api/apiClient";
+import { getTodayDate } from "../../../api/apiClient";
 import { Modal } from "../../../components/common/SharedUI";
 import ServiceBadge from "../../../components/common/ServiceBadge";
-import { validateSubscription } from "../../../utils/validateSubscription";
+import { validateSubscription } from "../utils/validateSubscription";
 export default function SubscriptionEditor({ subscription = null, onClose, onSaved }) {
   const [form, setForm] = useState(() => ({
       name: "",
@@ -19,7 +20,8 @@ export default function SubscriptionEditor({ subscription = null, onClose, onSav
     [busy, setBusy] = useState(false);
   useEffect(() => {
     let active = true;
-    apiRequest("/api/v1/catalog")
+    subscriptionsApi
+      .getServiceCatalog()
       .then((rows) => {
         if (active) setCatalog(Array.isArray(rows) ? rows : []);
       })
@@ -54,21 +56,7 @@ export default function SubscriptionEditor({ subscription = null, onClose, onSav
     setBusy(true);
     setError("");
     try {
-      const saved = await apiRequest(
-        "/api/v1/subscriptions" + (subscription ? "/" + subscription.id : ""),
-        {
-          method: subscription ? "PUT" : "POST",
-          body: {
-            name: form.name.trim(),
-            category: form.category,
-            amount: Number(form.amount),
-            cycle: form.cycle,
-            day: Number(form.day),
-            status: form.status,
-            billingAnchorDate: form.billingAnchorDate,
-          },
-        },
-      );
+      const saved = await subscriptionsApi.saveSubscription(subscription, form);
       if (!saved || saved.id == null || saved.id === "")
         throw new Error(
           "서버의 저장 결과를 확인할 수 없습니다. 목록에서 반영 여부를 확인해주세요.",

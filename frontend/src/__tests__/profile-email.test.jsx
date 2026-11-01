@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
-import ProfilePage from "../features/account/ProfilePage";
+import ProfilePage from "../features/account/pages/ProfilePage";
 import { apiRequest } from "../api/apiClient";
 vi.mock("../api/apiClient", () => ({ apiRequest: vi.fn() }));
 afterEach(() => {

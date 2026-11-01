@@ -1,10 +1,10 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
 import { apiRequest } from "../api/apiClient";
-import PaymentCalendarPage from "../features/payments/PaymentCalendarPage";
-import SubscriptionListPage from "../features/subscriptions/SubscriptionListPage";
-import LoginPage from "../features/auth/LoginPage";
-import CommunityPage from "../features/community/CommunityPage";
+import PaymentCalendarPage from "../features/payments/pages/PaymentCalendarPage";
+import SubscriptionListPage from "../features/subscriptions/pages/SubscriptionListPage";
+import LoginPage from "../features/auth/pages/LoginPage";
+import CommunityPage from "../features/community/pages/CommunityPage";
 vi.mock("../api/apiClient", () => ({
   apiRequest: vi.fn(),
   formatWon: (n) => Number(n || 0).toLocaleString("ko-KR") + "원",

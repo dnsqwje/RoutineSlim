@@ -2,9 +2,9 @@ import React from "react";
 import { render, screen, fireEvent, waitFor, cleanup, within } from "@testing-library/react";
 import { apiRequest } from "../api/apiClient";
 import SubscriptionEditor from "../features/subscriptions/components/SubscriptionEditor";
-import SavingsAnalysisPage from "../features/savings/SavingsAnalysisPage";
-import SubscriptionListPage from "../features/subscriptions/SubscriptionListPage";
-import { savingsAnalysis } from "../utils/subscriptionCalculations";
+import SavingsAnalysisPage from "../features/savings/pages/SavingsAnalysisPage";
+import SubscriptionListPage from "../features/subscriptions/pages/SubscriptionListPage";
+import { savingsAnalysis } from "../features/subscriptions/utils/subscriptionCalculations";
 vi.mock("../api/apiClient", () => ({
   apiRequest: vi.fn(),
   formatWon: (n) => Number(n || 0).toLocaleString("ko-KR") + "원",

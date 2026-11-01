@@ -1,8 +1,8 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
-import SpendingInsightsPage from "../features/reports/SpendingInsightsPage";
-import CommunityPage from "../features/community/CommunityPage";
-import PaymentHistoryPage from "../features/payments/PaymentHistoryPage";
+import SpendingInsightsPage from "../features/reports/pages/SpendingInsightsPage";
+import CommunityPage from "../features/community/pages/CommunityPage";
+import PaymentHistoryPage from "../features/payments/pages/PaymentHistoryPage";
 import { apiRequest } from "../api/apiClient";
 vi.mock("../api/apiClient", () => ({
   apiRequest: vi.fn(),
@@ -116,7 +116,7 @@ it("new payments in a different month become visible after saving", async () => 
   expect(apiRequest).toHaveBeenCalledWith("/api/v1/payments?month=2026-01");
 });
 it("profile updates include detailed fields from the shared profile API", async () => {
-  const { default: ProfilePage } = await import("../features/account/ProfilePage");
+  const { default: ProfilePage } = await import("../features/account/pages/ProfilePage");
   apiRequest.mockImplementation(async (path, options) =>
     options?.method === "PUT"
       ? { id: "user", ...options.body }

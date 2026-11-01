@@ -15,11 +15,27 @@ export function Status({ resource }) {
   return (
     <>
       {resource.error && (
-        <p className="error" role="alert">
-          {resource.error}
+        <>
+          <p className="error" role="alert">
+            {resource.error}
+          </p>
+          {resource.retryable !== false && typeof resource.reload === "function" && (
+            <button
+              type="button"
+              className="secondary small"
+              disabled={resource.loading || resource.busy}
+              onClick={() => resource.reload().catch(() => {})}
+            >
+              다시 불러오기
+            </button>
+          )}
+        </>
+      )}
+      {resource.loading && (
+        <p className="muted" role="status" aria-live="polite">
+          불러오는 중...
         </p>
       )}
-      {resource.loading && <p className="muted">불러오는 중...</p>}
     </>
   );
 }
@@ -56,20 +72,26 @@ export function Modal({ title, onClose, error, children }) {
   closeRef.current = onClose;
   useEffect(() => {
     const previous = document.activeElement;
-    const first = root.current?.querySelector("input,select,textarea,button");
+    const first =
+      root.current?.querySelector(
+        "input:not(:disabled):not([type=hidden]),select:not(:disabled),textarea:not(:disabled)",
+      ) || root.current?.querySelector("button:not(:disabled)");
     first?.focus();
     function key(e) {
       if (e.key === "Escape") closeRef.current();
       if (e.key === "Tab") {
         const fields = Array.from(
           root.current?.querySelectorAll(
-            "button:not(:disabled),input:not(:disabled),select,textarea,a[href]",
+            "button:not(:disabled),input:not(:disabled):not([type=hidden]),select:not(:disabled),textarea:not(:disabled),a[href]",
           ) || [],
         );
         if (!fields.length) return;
         const first = fields[0],
           last = fields[fields.length - 1];
-        if (e.shiftKey && document.activeElement === first) {
+        if (!root.current?.contains(document.activeElement)) {
+          e.preventDefault();
+          first.focus();
+        } else if (e.shiftKey && document.activeElement === first) {
           e.preventDefault();
           last.focus();
         } else if (!e.shiftKey && document.activeElement === last) {

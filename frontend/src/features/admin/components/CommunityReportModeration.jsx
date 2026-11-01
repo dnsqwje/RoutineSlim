@@ -1,21 +1,23 @@
+import * as adminApi from "../api/adminApi";
 import React, { useEffect, useState } from "react";
-import { apiRequest } from "../../../api/apiClient";
+
 export default function CommunityReportModeration() {
   const [admin, setAdmin] = useState(false),
     [items, setItems] = useState([]),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
   async function load() {
-    setItems(await apiRequest("/api/v1/community/reports"));
+    setItems(await adminApi.getReports());
   }
   useEffect(() => {
     let active = true;
-    apiRequest("/api/v1/community/moderation")
+    adminApi
+      .getModerationAccess()
       .then(async (value) => {
         if (active && value.admin) {
           setAdmin(true);
           try {
-            const reports = await apiRequest("/api/v1/community/reports");
+            const reports = await adminApi.getReports();
             if (active) setItems(reports);
           } catch (e) {
             if (active) setError(e.message);
@@ -31,9 +33,7 @@ export default function CommunityReportModeration() {
     setBusy(true);
     setError("");
     try {
-      await apiRequest(`/api/v1/community/reports/${report.id}/resolve`, {
-        method: "POST",
-      });
+      await adminApi.resolveReport(report);
       await load();
     } catch (e) {
       setError(e.message);
@@ -46,9 +46,7 @@ export default function CommunityReportModeration() {
     setBusy(true);
     setError("");
     try {
-      await apiRequest(`/api/v1/community/moderation/posts/${report.postId}`, {
-        method: "DELETE",
-      });
+      await adminApi.setPostHidden(report);
       await load();
     } catch (e) {
       setError(e.message);

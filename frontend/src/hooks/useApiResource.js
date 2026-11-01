@@ -5,17 +5,20 @@ export function useApiResource(path) {
   const data = result.path === path ? result.data : null;
   const setData = (value) => setResult({ path, data: value });
   const [error, setError] = useState(""),
+    [retryable, setRetryable] = useState(true),
     [loading, setLoading] = useState(true),
     [busy, setBusy] = useState(false);
   const sequence = useRef(0),
     locked = useRef(false);
   const reload = useCallback(async () => {
+    const current = ++sequence.current;
+    setError("");
+    setRetryable(true);
     if (!path) {
       setData(null);
       setLoading(false);
       return;
     }
-    const current = ++sequence.current;
     setLoading(true);
     try {
       const value = await apiRequest(path);
@@ -25,7 +28,10 @@ export function useApiResource(path) {
       }
       return value;
     } catch (e) {
-      if (current === sequence.current) setError(e.message);
+      if (current === sequence.current) {
+        setError(e.message);
+        setRetryable(e.code !== "API_NOT_AVAILABLE");
+      }
       throw e;
     } finally {
       if (current === sequence.current) setLoading(false);
@@ -42,16 +48,18 @@ export function useApiResource(path) {
     locked.current = true;
     setBusy(true);
     setError("");
+    setRetryable(true);
     try {
       await work();
       return true;
     } catch (e) {
       setError(e.message);
+      setRetryable(e.code !== "API_NOT_AVAILABLE");
       return false;
     } finally {
       locked.current = false;
       setBusy(false);
     }
   }
-  return { data, setData, error, setError, loading, busy, reload, run };
+  return { data, setData, error, setError, retryable, loading, busy, reload, run };
 }

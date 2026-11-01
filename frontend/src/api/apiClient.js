@@ -47,7 +47,8 @@ export async function apiRequest(path, options = {}) {
       typeof window !== "undefined"
     )
       window.dispatchEvent(new Event("routineslim:unauthorized"));
-    const detail = value && typeof value === "object" ? value.message || value.error : null;
+    const detail =
+      value && typeof value === "object" ? value.message || value.detail || value.error : null;
     throw new Error(typeof detail === "string" ? detail : `요청 실패 (${response.status})`);
   }
   return value;

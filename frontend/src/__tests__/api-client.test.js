@@ -190,9 +190,9 @@ describe("optional Server-dev bridge", () => {
   });
   it("does not pretend missing APIs succeeded", async () => {
     const apiRequest = await server();
-    await expect(apiRequest("/api/v1/community/posts")).rejects.toThrow("API가 없습니다");
+    await expect(apiRequest("/api/v1/community/posts")).rejects.toThrow("지원하지 않습니다");
     await expect(apiRequest("/api/v1/reports/monthly?month=2026-11")).rejects.toThrow(
-      "API가 없습니다",
+      "지원하지 않습니다",
     );
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });

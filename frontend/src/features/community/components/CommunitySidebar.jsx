@@ -1,12 +1,14 @@
+import * as communityApi from "../api/communityApi";
 import React, { useEffect, useState } from "react";
-import { apiRequest } from "../../../api/apiClient";
+
 export default function CommunitySidebar({ navigate }) {
   const [posts, setPosts] = useState([]),
     [error, setError] = useState("");
   useEffect(() => {
     let active = true;
     function load() {
-      apiRequest("/api/v1/community/posts")
+      communityApi
+        .getPosts()
         .then((value) => {
           if (active) {
             setPosts(value);

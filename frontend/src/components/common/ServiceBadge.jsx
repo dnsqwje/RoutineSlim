@@ -1,4 +1,4 @@
-import { useServiceCatalog } from "../../hooks/useServiceCatalog";
+import { useServiceCatalog } from "../../features/subscriptions/hooks/useServiceCatalog";
 import React from "react";
 const palette = ["#7047ff", "#a18aff", "#c3b5ff", "#8cc5ff", "#6bd6ba", "#f6bb73", "#e9a5d2"];
 export default function ServiceBadge({ name = "", icon, background }) {
