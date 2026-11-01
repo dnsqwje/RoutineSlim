@@ -1,0 +1,64 @@
+# RoutineSlim — 원본 웹 프론트엔드
+
+이번에 첨부한 `frontend.zip`에서 분리한 **PC 웹용 React 프론트엔드**입니다. 이전에 만든 모바일 앱 형태의 웹과 별개입니다.
+
+원본의 좌측 사이드바, 상단 영역, 넓은 대시보드·구독 표·차트·우측 패널, 색상·글꼴·반응형 배치를 그대로 사용합니다. `src/components`, `src/features`, `src/styles` 및 `public`의 파일을 수정하지 않았습니다. 원본과 동일한 파일의 SHA-256은 `docs/PRESERVED-FILES.sha256`에 있습니다.
+
+## Windows에서 실행
+
+1. Node.js **24.15.0(팀 기준, 24 LTS)을 일반 설치 프로그램으로 설치**합니다. Node.js ZIP을 풀어 그 안의 npm 폴더로 들어가는 방식은 사용하지 않아도 됩니다.
+2. 이 ZIP을 **모두 압축 풀기**로 해제합니다.
+3. `package.json`과 `실행.bat`이 보이는 `frontend` 폴더에서 **`실행.bat`을 더블클릭**합니다.
+4. 설치가 끝나면 개발 서버가 실행되며 브라우저가 열립니다. 기본 주소는 `http://localhost:5173`입니다. 검은 창은 실행 중 켜두세요.
+
+직접 명령을 실행하려면 같은 폴더에서:
+
+```sh
+npm ci
+npm run dev
+```
+
+이 패키지에는 Java·Maven·Gradle·DB·백엔드 코드가 포함되지 않습니다. 프론트 실행 자체에는 Node만 필요하지만 **로그인과 데이터 기능에는 별도로 실행한 서버가 필요합니다.** 서버 없이 로그인에 성공시키거나 가짜 데이터를 넣지 않았습니다.
+
+## 서버 주소 설정
+
+`.env.example`을 `.env.local`로 복사하고 백엔드 주소를 바꾼 뒤 개발 서버를 재시작하세요.
+
+```dotenv
+API_PROXY_TARGET=http://localhost:8080
+VITE_API_MODE=original
+VITE_API_BASE_URL=
+```
+
+기본값인 `original`은 원본 웹의 전체 API 규격·세션 쿠키·CSRF 동작을 유지합니다. **첨부한 `RoutineSlim-Server-dev`는 이 원본 웹과 API 규격/기능이 다릅니다.** 서버 전체가 바로 호환되는 상태는 아닙니다.
+
+첨부 서버의 UUID 로그인과 구독 CRUD를 위한 `server-dev` 부분 연결 어댑터도 제공합니다. 사용하는 경우 `.env.server-dev.example`을 `.env.local`로 복사하고 실제 서버 카테고리 ID를 설정하세요. 첨부 서버의 보호 API 인증, 원본 전용 기능 API 등은 서버 측에서 완성이 필요합니다.
+
+[마지막 첨부 서버의 기준 정보](docs/SERVER-BASELINE.md)도 기록했습니다. 기능별 대응과 서버 담당자의 작업 목록은 **[서버 연결 안내](docs/SERVER-INTEGRATION.md)**에서 확인하세요. 화면을 삭제하거나 없는 API를 성공으로 가장하지 않습니다.
+
+## 빌드·검증
+
+```sh
+npm test
+npm run build
+npm run preview
+```
+
+- 원본 프론트 테스트 40개 유지
+- API 설정·Server-dev 연결 어댑터 테스트 12개 + 서버 클라이언트 테스트 6개 추가
+- [화면 비교 및 검증 결과](docs/VALIDATION.md): 로그인·대시보드·구독 목록·추가 모달·모바일 화면이 원본과 픽셀 단위로 일치했습니다.
+- 모든 테스트는 모의 API를 사용하는 프론트 검증이며 실제 서버 통합 검증과는 다릅니다.
+- 빌드 결과는 `dist/`에 생성됩니다. 백엔드 폴더로 자동 복사하거나 기존 서버 파일을 삭제하지 않습니다.
+- 원본이 해시 라우팅(`#subscriptions` 등)을 사용하므로 별도의 React 라우터 서버는 필요하지 않습니다. `index.html`을 더블클릭하지 말고 HTTP 서버로 실행하세요.
+
+`public/legacy/`도 원본 그대로 보존했습니다. 기본 시작 화면은 `src/main.jsx`의 React 웹입니다. 이전 legacy 화면은 기본 실행에 사용하지 않으며 선택적 Server-dev 어댑터도 React 웹에만 적용됩니다.
+
+## 변경 범위
+
+- 백엔드 복사 전용 `build:backend` 명령과 서버 동기화 스크립트 제외
+- 개발/미리보기 API 프록시 주소를 `.env.local`에서 설정 가능하도록 분리
+- 공통 API 클라이언트에 외부 API 주소 및 선택적 Server-dev 어댑터 연결
+- Windows 실행 파일, 연결 문서와 테스트 추가
+- `package-lock.json`, UI 컴포넌트·화면·스타일·폰트 원본 유지
+
+프론트의 원본 기능 코드는 모두 포함합니다. 원본 기능을 실제 데이터로 모두 사용하려면 연결할 서버도 같은 API를 제공해야 합니다.
