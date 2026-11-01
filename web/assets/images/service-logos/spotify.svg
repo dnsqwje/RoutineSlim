@@ -1,0 +1,11 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Spotify mark" clip-path="url(#clip0_0_6)">
+<circle id="Brand circle" cx="12" cy="12" r="12" fill="#1DB954"/>
+<path id="Sound waves" d="M4 7.60927C9 5.30022 15 5.30022 20 8.76379M5 12.2274C10 9.91832 14 9.91832 19 13.3819M6 16.8455C10 14.5364 14 14.5364 18 18" stroke-width="1.8" stroke-linecap="round" stroke="#172B20"/>
+</g>
+<defs>
+<clipPath id="clip0_0_6">
+<rect width="24" height="24" fill="white"/>
+</clipPath>
+</defs>
+</svg>

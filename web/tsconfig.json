@@ -1,0 +1,57 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "noEmit": true,
+    "types": [
+      "vite/client",
+      "node"
+    ],
+    "paths": {
+      "@/assets/*": [
+        "./assets/*"
+      ],
+      "@/*": [
+        "./src/*"
+      ],
+      "react-native-svg": [
+        "./src/web/svg.tsx"
+      ],
+      "expo-router": [
+        "./src/web/router.tsx"
+      ],
+      "react-native-safe-area-context": [
+        "./src/web/safe-area.tsx"
+      ],
+      "expo-linear-gradient": [
+        "./src/web/gradient.tsx"
+      ],
+      "expo-constants": [
+        "./src/web/constants.ts"
+      ],
+      "expo-secure-store": [
+        "./src/web/storage.ts"
+      ],
+      "@react-native-async-storage/async-storage": [
+        "./src/web/storage.ts"
+      ]
+    }
+  },
+  "include": [
+    "src",
+    "vite.config.ts",
+    "tests",
+    "playwright.config.ts"
+  ]
+}

@@ -1,0 +1,20 @@
+<svg width="560" height="660" viewBox="232 182 560 660" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="stem" x1="324" y1="392" x2="324" y2="822" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5B4FE3"/>
+      <stop offset="1" stop-color="#4338CA"/>
+    </linearGradient>
+    <linearGradient id="bowl" x1="254" y1="202" x2="769" y2="632" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#A193FF"/>
+      <stop offset="1" stop-color="#6C5CF0"/>
+    </linearGradient>
+    <linearGradient id="leg" x1="514" y1="562" x2="684" y2="752" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4A3FD0"/>
+      <stop offset="0.45" stop-color="#7666F3"/>
+      <stop offset="1" stop-color="#5145DA"/>
+    </linearGradient>
+  </defs>
+  <rect x="254" y="392" width="140" height="430" rx="56" fill="url(#stem)"/>
+  <path d="M514 562L684 752" stroke="url(#leg)" stroke-width="140" stroke-linecap="round"/>
+  <path d="M324 272H554A145 145 0 0 1 554 562H514" stroke="url(#bowl)" stroke-width="140" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
