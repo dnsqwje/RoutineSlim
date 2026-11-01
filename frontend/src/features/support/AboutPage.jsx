@@ -2,21 +2,9 @@ import React from "react";
 import BrandLogo from "../../components/common/BrandLogo";
 export default function AboutPage({ user, navigate }) {
   const features = [
-    [
-      "한곳에서 관리",
-      "구독과 고정비의 금액·일정을 모아서 확인하세요.",
-      "subscriptions",
-    ],
-    [
-      "내 지출 이해하기",
-      "실제 결제 기록과 월간 결산으로 변화를 확인하세요.",
-      "monthly",
-    ],
-    [
-      "나에게 맞는 절약",
-      "무료체험과 요금제 비교, 절약 목표를 활용하세요.",
-      "trials",
-    ],
+    ["한곳에서 관리", "구독과 고정비의 금액·일정을 모아서 확인하세요.", "subscriptions"],
+    ["내 지출 이해하기", "실제 결제 기록과 월간 결산으로 변화를 확인하세요.", "monthly"],
+    ["나에게 맞는 절약", "무료체험과 요금제 비교, 절약 목표를 활용하세요.", "trials"],
   ];
   return (
     <section className="feature-page feature-about">
@@ -34,10 +22,7 @@ export default function AboutPage({ user, navigate }) {
             나에게 맞는 절약 습관을 만들어보세요.
           </p>
           <div className="feature-actions">
-            <button
-              className="primary"
-              onClick={() => navigate(user ? "subscriptions" : "login")}
-            >
+            <button className="primary" onClick={() => navigate(user ? "subscriptions" : "login")}>
               구독 관리 시작하기 →
             </button>
             <button className="secondary" onClick={() => navigate("support")}>
@@ -69,10 +54,7 @@ export default function AboutPage({ user, navigate }) {
           <section className="panel" key={title}>
             <h2>{title}</h2>
             <p className="muted">{content}</p>
-            <button
-              className="feature-text-link"
-              onClick={() => navigate(user ? page : "login")}
-            >
+            <button className="feature-text-link" onClick={() => navigate(user ? page : "login")}>
               살펴보기 →
             </button>
           </section>
@@ -81,15 +63,11 @@ export default function AboutPage({ user, navigate }) {
       <section className="panel">
         <h2>내 데이터로 직접 관리하세요.</h2>
         <p className="muted">
-          실제 지출은 기록한 결제 내역으로 계산합니다. 금융 계좌에서 자동으로
-          거래를 가져오거나 구독을 대신 해지하지 않습니다. 구독 비교 요금은
-          등록된 출처와 수정일을 확인해주세요.
+          실제 지출은 기록한 결제 내역으로 계산합니다. 금융 계좌에서 자동으로 거래를 가져오거나
+          구독을 대신 해지하지 않습니다. 구독 비교 요금은 등록된 출처와 수정일을 확인해주세요.
         </p>
         <div className="feature-actions">
-          <button
-            className="secondary"
-            onClick={() => navigate(user ? "comparison" : "login")}
-          >
+          <button className="secondary" onClick={() => navigate(user ? "comparison" : "login")}>
             구독 비교
           </button>
           <button className="secondary" onClick={() => navigate("support")}>

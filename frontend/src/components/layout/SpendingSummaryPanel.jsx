@@ -1,6 +1,6 @@
 import { useAccountSetting } from "../../hooks/useAccountSetting";
 import React, { useEffect, useState } from "react";
-import { request, money, today } from "../../api/apiClient";
+import { apiRequest, formatWon, getTodayDate } from "../../api/apiClient";
 import CategorySpendingChart from "../charts/CategorySpendingChart";
 import ServiceBadge from "../common/ServiceBadge";
 export default function SpendingSummaryPanel({ page, user, navigate }) {
@@ -11,9 +11,9 @@ export default function SpendingSummaryPanel({ page, user, navigate }) {
     let active = true;
     function load() {
       Promise.all([
-        request("/api/v1/expenses/summary"),
-        request("/api/v1/reminders"),
-        request("/api/v1/savings/summary"),
+        apiRequest("/api/v1/expenses/summary"),
+        apiRequest("/api/v1/reminders"),
+        apiRequest("/api/v1/savings/summary"),
       ])
         .then(([expense, reminders, savings]) => {
           if (active) {
@@ -45,16 +45,15 @@ export default function SpendingSummaryPanel({ page, user, navigate }) {
         </div>
         {data ? (
           <>
-            <strong className="rail-total">
-              {money(data.expense?.monthlyTotal)}
-            </strong>
+            <strong className="rail-total">{formatWon(data.expense?.monthlyTotal)}</strong>
             <p className="muted">
               월 예상 구독료 · {data.expense?.subscriptionCount || 0}개 서비스
             </p>
             <CategorySpendingChart
-              entries={Object.entries(data.expense?.byCategory || {}).map(
-                ([category, amount]) => ({ category, amount }),
-              )}
+              entries={Object.entries(data.expense?.byCategory || {}).map(([category, amount]) => ({
+                category,
+                amount,
+              }))}
             />
           </>
         ) : (
@@ -68,32 +67,25 @@ export default function SpendingSummaryPanel({ page, user, navigate }) {
             전체 보기 →
           </button>
         </div>
-        {data?.reminders.filter((x) => x.daysUntil <= Number(setting.value))
-          .length ? (
+        {data?.reminders.filter((x) => x.daysUntil <= Number(setting.value)).length ? (
           data.reminders
             .filter((x) => x.daysUntil <= Number(setting.value))
             .slice(0, 5)
             .map((x, i) => (
-              <div
-                className="rail-payment"
-                key={`${x.subscriptionId}-${x.date}-${i}`}
-              >
+              <div className="rail-payment" key={`${x.subscriptionId}-${x.date}-${i}`}>
                 <ServiceBadge name={x.name} />
                 <div>
                   <b>{x.name}</b>
                   <small>
-                    {x.date} ·{" "}
-                    {x.daysUntil === 0 ? "오늘" : `${x.daysUntil}일 후`}
+                    {x.date} · {x.daysUntil === 0 ? "오늘" : `${x.daysUntil}일 후`}
                   </small>
                 </div>
-                <strong>{money(x.amount)}</strong>
+                <strong>{formatWon(x.amount)}</strong>
               </div>
             ))
         ) : (
           <p className="muted">
-            {data
-              ? "예정된 결제가 없습니다."
-              : "결제 일정을 확인하고 있습니다."}
+            {data ? "예정된 결제가 없습니다." : "결제 일정을 확인하고 있습니다."}
           </p>
         )}
       </section>
@@ -109,9 +101,7 @@ export default function SpendingSummaryPanel({ page, user, navigate }) {
           <br />
           나에게 맞는 목표를 세워보세요.
         </p>
-        {data && (
-          <strong>월 검토액 {money(data.savings?.monthlyReviewSavings)}</strong>
-        )}
+        {data && <strong>월 검토액 {formatWon(data.savings?.monthlyReviewSavings)}</strong>}
         <button className="primary" onClick={() => navigate("goals")}>
           절약 목표 관리 →
         </button>
@@ -128,7 +118,7 @@ export default function SpendingSummaryPanel({ page, user, navigate }) {
           도움이 필요하세요? <span>↗</span>
         </button>
       </section>
-      <p className="rail-date">{today()} · RoutineSlim</p>
+      <p className="rail-date">{getTodayDate()} · RoutineSlim</p>
     </aside>
   );
 }

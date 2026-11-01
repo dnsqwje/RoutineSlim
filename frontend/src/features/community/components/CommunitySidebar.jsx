@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { request } from "../../../api/apiClient";
+import { apiRequest } from "../../../api/apiClient";
 export default function CommunitySidebar({ navigate }) {
   const [posts, setPosts] = useState([]),
     [error, setError] = useState("");
   useEffect(() => {
     let active = true;
     function load() {
-      request("/api/v1/community/posts")
+      apiRequest("/api/v1/community/posts")
         .then((value) => {
           if (active) {
             setPosts(value);
@@ -25,8 +25,7 @@ export default function CommunitySidebar({ navigate }) {
     };
   }, []);
   const tags = {};
-  for (const p of posts)
-    for (const tag of p.tags || []) tags[tag] = (tags[tag] || 0) + 1;
+  for (const p of posts) for (const tag of p.tags || []) tags[tag] = (tags[tag] || 0) + 1;
   return (
     <aside className="overview-rail" aria-label="커뮤니티 안내">
       <section className="panel">
@@ -47,9 +46,7 @@ export default function CommunitySidebar({ navigate }) {
             </span>
           </button>
         ))}
-        {!posts.length && !error && (
-          <p className="muted">첫 이야기를 나눠보세요.</p>
-        )}
+        {!posts.length && !error && <p className="muted">첫 이야기를 나눠보세요.</p>}
       </section>
       <section className="panel">
         <h2>함께 찾는 태그</h2>
@@ -72,9 +69,7 @@ export default function CommunitySidebar({ navigate }) {
               </button>
             ))}
         </div>
-        {!Object.keys(tags).length && (
-          <p className="muted">게시글에 태그를 추가해보세요.</p>
-        )}
+        {!Object.keys(tags).length && <p className="muted">게시글에 태그를 추가해보세요.</p>}
       </section>
       <section className="rail-tip">
         <span className="eyebrow">COMMUNITY GUIDE</span>
@@ -84,8 +79,7 @@ export default function CommunitySidebar({ navigate }) {
           누군가에게는 큰 도움
         </h2>
         <p>
-          직접 사용한 서비스와 절약 습관을 나눠주세요. 개인정보는 올리지 말고
-          서로 존중해주세요.
+          직접 사용한 서비스와 절약 습관을 나눠주세요. 개인정보는 올리지 말고 서로 존중해주세요.
         </p>
       </section>
       <section className="panel">

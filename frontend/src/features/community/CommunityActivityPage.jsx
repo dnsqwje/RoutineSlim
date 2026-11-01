@@ -1,14 +1,7 @@
 import { useApiResource } from "../../hooks/useApiResource";
 import React, { useState } from "react";
-import { request } from "../../api/apiClient";
-import {
-  Heading,
-  Status,
-  Empty,
-  Tabs,
-  Stats,
-  dateText,
-} from "../../components/common/SharedUI";
+import { apiRequest } from "../../api/apiClient";
+import { Heading, Status, Empty, Tabs, Stats, dateText } from "../../components/common/SharedUI";
 export default function CommunityActivityPage({ navigate }) {
   const r = useApiResource("/api/v1/activity/me"),
     [tab, setTab] = useState("posts"),
@@ -16,24 +9,14 @@ export default function CommunityActivityPage({ navigate }) {
     [page, setPage] = useState(1);
   const d = r.data || { posts: [], comments: [], likes: [] };
   const rows = d[tab].filter((x) =>
-    (x.title + " " + (x.content || ""))
-      .toLowerCase()
-      .includes(search.toLowerCase()),
+    (x.title + " " + (x.content || "")).toLowerCase().includes(search.toLowerCase()),
   );
   const pages = Math.max(1, Math.ceil(rows.length / 10));
   async function remove(x) {
-    if (
-      !confirm(
-        tab === "comments"
-          ? "이 댓글을 삭제할까요?"
-          : "이 게시글을 삭제할까요?",
-      )
-    )
-      return;
+    if (!confirm(tab === "comments" ? "이 댓글을 삭제할까요?" : "이 게시글을 삭제할까요?")) return;
     await r.run(async () => {
-      await request(
-        "/api/v1/community/posts/" +
-          (tab === "comments" ? x.postId + "/comments/" + x.id : x.id),
+      await apiRequest(
+        "/api/v1/community/posts/" + (tab === "comments" ? x.postId + "/comments/" + x.id : x.id),
         { method: "DELETE" },
       );
       await r.reload();
@@ -42,7 +25,7 @@ export default function CommunityActivityPage({ navigate }) {
   }
   async function unlike(x) {
     await r.run(async () => {
-      await request(`/api/v1/community/posts/${x.id}/likes/toggle`, {
+      await apiRequest(`/api/v1/community/posts/${x.id}/likes/toggle`, {
         method: "POST",
       });
       await r.reload();
@@ -87,48 +70,38 @@ export default function CommunityActivityPage({ navigate }) {
             }}
           />
         </div>
-        {rows
-          .slice((Math.min(page, pages) - 1) * 10, Math.min(page, pages) * 10)
-          .map((x) => (
-            <article className="feature-row" key={x.id}>
-              <div className="feature-grow">
-                <button
-                  className="feature-text-link"
-                  onClick={() => navigate("community", x.postId || x.id)}
-                >
-                  {x.title}
-                </button>
-                {x.content && <p className="post-body">{x.content}</p>}
-                <p>
-                  {dateText(x.createdAt)}
-                  {x.category ? " · " + x.category : ""}
-                </p>
-              </div>
+        {rows.slice((Math.min(page, pages) - 1) * 10, Math.min(page, pages) * 10).map((x) => (
+          <article className="feature-row" key={x.id}>
+            <div className="feature-grow">
               <button
-                className="secondary small"
+                className="feature-text-link"
                 onClick={() => navigate("community", x.postId || x.id)}
               >
-                글 보기
+                {x.title}
               </button>
-              {tab === "likes" ? (
-                <button
-                  className="secondary small"
-                  disabled={r.busy}
-                  onClick={() => unlike(x)}
-                >
-                  좋아요 취소
-                </button>
-              ) : (
-                <button
-                  className="danger small"
-                  disabled={r.busy}
-                  onClick={() => remove(x)}
-                >
-                  삭제
-                </button>
-              )}
-            </article>
-          ))}
+              {x.content && <p className="post-body">{x.content}</p>}
+              <p>
+                {dateText(x.createdAt)}
+                {x.category ? " · " + x.category : ""}
+              </p>
+            </div>
+            <button
+              className="secondary small"
+              onClick={() => navigate("community", x.postId || x.id)}
+            >
+              글 보기
+            </button>
+            {tab === "likes" ? (
+              <button className="secondary small" disabled={r.busy} onClick={() => unlike(x)}>
+                좋아요 취소
+              </button>
+            ) : (
+              <button className="danger small" disabled={r.busy} onClick={() => remove(x)}>
+                삭제
+              </button>
+            )}
+          </article>
+        ))}
         {!rows.length && <Empty>표시할 활동이 없습니다.</Empty>}
         <div className="feature-pagination">
           <button

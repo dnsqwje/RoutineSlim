@@ -1,13 +1,7 @@
 import { useApiResource } from "../../hooks/useApiResource";
 import React, { useEffect, useState } from "react";
-import { request, money } from "../../api/apiClient";
-import {
-  Heading,
-  Status,
-  Stats,
-  Empty,
-  dateText,
-} from "../../components/common/SharedUI";
+import { apiRequest, formatWon } from "../../api/apiClient";
+import { Heading, Status, Stats, Empty, dateText } from "../../components/common/SharedUI";
 export default function SubscriptionDetailPage({ id, navigate }) {
   const r = useApiResource(id ? `/api/v1/subscriptions/${id}/detail` : null),
     [note, setNote] = useState(""),
@@ -20,7 +14,7 @@ export default function SubscriptionDetailPage({ id, navigate }) {
   async function save(e) {
     e.preventDefault();
     await r.run(async () => {
-      await request(`/api/v1/subscriptions/${id}/note`, {
+      await apiRequest(`/api/v1/subscriptions/${id}/note`, {
         method: "PUT",
         body: { note },
       });
@@ -44,18 +38,10 @@ export default function SubscriptionDetailPage({ id, navigate }) {
             items={[
               [
                 "정기 결제 금액",
-                money(s.amount),
-                s.cycle === "weekly"
-                  ? "매주"
-                  : s.cycle === "yearly"
-                    ? "매년"
-                    : "매월",
+                formatWon(s.amount),
+                s.cycle === "weekly" ? "매주" : s.cycle === "yearly" ? "매년" : "매월",
               ],
-              [
-                "누적 기록 지출",
-                money(d.totalPaid),
-                "직접 기록한 연결 결제 기준",
-              ],
+              ["누적 기록 지출", formatWon(d.totalPaid), "직접 기록한 연결 결제 기준"],
               ["결제 기록", d.payments.length + "건"],
             ]}
           />
@@ -69,19 +55,16 @@ export default function SubscriptionDetailPage({ id, navigate }) {
                       <b>{x.description}</b>
                       <p>{dateText(x.paidOn)}</p>
                     </div>
-                    <strong>{money(x.amount)}</strong>
+                    <strong>{formatWon(x.amount)}</strong>
                   </div>
                 ))
               ) : (
                 <Empty>
-                  연결된 결제 기록이 없습니다. 실제 결제 내역 화면에서 이 구독을
-                  선택해 기록해주세요.
+                  연결된 결제 기록이 없습니다. 실제 결제 내역 화면에서 이 구독을 선택해
+                  기록해주세요.
                 </Empty>
               )}
-              <button
-                className="secondary"
-                onClick={() => navigate("payments")}
-              >
+              <button className="secondary" onClick={() => navigate("payments")}>
                 실제 결제 기록 →
               </button>
               <h2 style={{ marginTop: 24 }}>요금·정보 변경 기록</h2>
@@ -96,9 +79,8 @@ export default function SubscriptionDetailPage({ id, navigate }) {
                           : "정보 변경"}
                     </b>
                     <p>
-                      {dateText(x.createdAt)} ·{" "}
-                      {x.before ? money(x.before.amount) + " → " : ""}
-                      {money(x.after?.amount)}
+                      {dateText(x.createdAt)} · {x.before ? formatWon(x.before.amount) + " → " : ""}
+                      {formatWon(x.after?.amount)}
                     </p>
                   </div>
                 ))
@@ -114,9 +96,7 @@ export default function SubscriptionDetailPage({ id, navigate }) {
                   관리 상태: {s.status === "active" ? "사용 중" : "절약 검토"}
                 </p>
                 <p className="muted">결제일: {s.day}일</p>
-                <p className="muted">
-                  기준일: {s.billingAnchorDate || "미설정"}
-                </p>
+                <p className="muted">기준일: {s.billingAnchorDate || "미설정"}</p>
               </section>
               <section className="panel">
                 <h2>관리 메모</h2>

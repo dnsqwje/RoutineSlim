@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { request } from "../../api/apiClient";
+import { apiRequest } from "../../api/apiClient";
 export default function ProfilePage({ onDeleted }) {
   const [profile, setProfile] = useState(null),
     [error, setError] = useState(""),
@@ -12,7 +12,7 @@ export default function ProfilePage({ onDeleted }) {
   const [currentPassword, setCurrentPassword] = useState(""),
     [newPassword, setNewPassword] = useState("");
   useEffect(() => {
-    request("/api/v1/members/me")
+    apiRequest("/api/v1/members/me")
       .then(setProfile)
       .catch((e) => setError(e.message));
   }, []);
@@ -22,7 +22,7 @@ export default function ProfilePage({ onDeleted }) {
     setError("");
     setMessage("");
     try {
-      const updated = await request("/api/v1/members/me", {
+      const updated = await apiRequest("/api/v1/members/me", {
         method: "PUT",
         body: {
           displayName: profile.displayName,
@@ -47,15 +47,13 @@ export default function ProfilePage({ onDeleted }) {
     setError("");
     setMessage("");
     try {
-      const result = await request("/api/v1/members/me/email/send", {
+      const result = await apiRequest("/api/v1/members/me/email/send", {
         method: "POST",
         body: { email: emailDraft, currentPassword: emailPassword },
       });
       setEmailProof(result.verificationId);
       setEmailCode("");
-      setMessage(
-        "새 이메일로 인증번호를 발송했습니다. 10분 안에 입력해주세요.",
-      );
+      setMessage("새 이메일로 인증번호를 발송했습니다. 10분 안에 입력해주세요.");
     } catch (e) {
       setError(e.message);
     } finally {
@@ -68,7 +66,7 @@ export default function ProfilePage({ onDeleted }) {
     setError("");
     setMessage("");
     try {
-      const updated = await request("/api/v1/members/me/email", {
+      const updated = await apiRequest("/api/v1/members/me/email", {
         method: "PUT",
         body: {
           email: emailDraft,
@@ -82,9 +80,7 @@ export default function ProfilePage({ onDeleted }) {
       setEmailPassword("");
       setEmailCode("");
       setEmailProof("");
-      setMessage(
-        "이메일을 변경했습니다. 앞으로 계정 복구에 새 이메일을 사용하세요.",
-      );
+      setMessage("이메일을 변경했습니다. 앞으로 계정 복구에 새 이메일을 사용하세요.");
     } catch (e) {
       setError(e.message);
     } finally {
@@ -121,7 +117,7 @@ export default function ProfilePage({ onDeleted }) {
     setError("");
     setMessage("");
     try {
-      await request("/api/password", {
+      await apiRequest("/api/password", {
         method: "PUT",
         body: { currentPassword, password: newPassword },
       });
@@ -144,7 +140,7 @@ export default function ProfilePage({ onDeleted }) {
     setBusy(true);
     setError("");
     try {
-      await request("/api/me", { method: "DELETE" });
+      await apiRequest("/api/me", { method: "DELETE" });
       onDeleted?.();
     } catch (e) {
       setError(e.message);
@@ -170,9 +166,7 @@ export default function ProfilePage({ onDeleted }) {
             {profile.photo ? (
               <img src={profile.photo} alt="내 프로필" />
             ) : (
-              <span>
-                {(profile.displayName || profile.id || "R").slice(0, 1)}
-              </span>
+              <span>{(profile.displayName || profile.id || "R").slice(0, 1)}</span>
             )}
             <div>
               <small>MY ACCOUNT</small>
@@ -195,9 +189,7 @@ export default function ProfilePage({ onDeleted }) {
                 required
                 maxLength={120}
                 value={profile.displayName || ""}
-                onChange={(e) =>
-                  setProfile({ ...profile, displayName: e.target.value })
-                }
+                onChange={(e) => setProfile({ ...profile, displayName: e.target.value })}
               />
             </label>
             <label>
@@ -205,16 +197,10 @@ export default function ProfilePage({ onDeleted }) {
               <input
                 type="email"
                 readOnly={profile.emailVerified}
-                title={
-                  profile.emailVerified
-                    ? "가입 시 인증한 이메일입니다."
-                    : undefined
-                }
+                title={profile.emailVerified ? "가입 시 인증한 이메일입니다." : undefined}
                 maxLength={255}
                 value={profile.email || ""}
-                onChange={(e) =>
-                  setProfile({ ...profile, email: e.target.value })
-                }
+                onChange={(e) => setProfile({ ...profile, email: e.target.value })}
               />
             </label>
             <label>
@@ -223,9 +209,7 @@ export default function ProfilePage({ onDeleted }) {
                 type="tel"
                 maxLength={20}
                 value={profile.phone || ""}
-                onChange={(e) =>
-                  setProfile({ ...profile, phone: e.target.value })
-                }
+                onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
               />
             </label>
             <label>
@@ -233,9 +217,7 @@ export default function ProfilePage({ onDeleted }) {
               <input
                 type="date"
                 value={profile.birth || ""}
-                onChange={(e) =>
-                  setProfile({ ...profile, birth: e.target.value })
-                }
+                onChange={(e) => setProfile({ ...profile, birth: e.target.value })}
               />
             </label>
             <label>
@@ -243,9 +225,7 @@ export default function ProfilePage({ onDeleted }) {
               <input
                 maxLength={250}
                 value={profile.address || ""}
-                onChange={(e) =>
-                  setProfile({ ...profile, address: e.target.value })
-                }
+                onChange={(e) => setProfile({ ...profile, address: e.target.value })}
               />
             </label>
             <label>
@@ -253,27 +233,16 @@ export default function ProfilePage({ onDeleted }) {
               <input
                 maxLength={150}
                 value={profile.addressDetail || ""}
-                onChange={(e) =>
-                  setProfile({ ...profile, addressDetail: e.target.value })
-                }
+                onChange={(e) => setProfile({ ...profile, addressDetail: e.target.value })}
               />
             </label>
             <label>
               프로필 사진 (최대 5MB)
-              <input
-                type="file"
-                accept="image/jpeg,image/png,image/gif"
-                onChange={selectPhoto}
-              />
+              <input type="file" accept="image/jpeg,image/png,image/gif" onChange={selectPhoto} />
             </label>
             {profile.photo && (
               <div>
-                <img
-                  src={profile.photo}
-                  alt="프로필 사진"
-                  width={80}
-                  height={80}
-                />
+                <img src={profile.photo} alt="프로필 사진" width={80} height={80} />
                 <button
                   type="button"
                   className="secondary"
@@ -380,22 +349,14 @@ export default function ProfilePage({ onDeleted }) {
             비밀번호 변경
           </button>
         </form>
-        <p className="muted">
-          소셜 로그인 전용 계정은 별도 비밀번호가 없을 수 있습니다.
-        </p>
+        <p className="muted">소셜 로그인 전용 계정은 별도 비밀번호가 없을 수 있습니다.</p>
       </div>
       <div className="panel">
         <h2>회원 탈퇴</h2>
         <p className="muted">
-          탈퇴하면 계정과 연결된 데이터가 삭제됩니다. 탈퇴 전에 필요한 내역을
-          CSV로 보관하세요.
+          탈퇴하면 계정과 연결된 데이터가 삭제됩니다. 탈퇴 전에 필요한 내역을 CSV로 보관하세요.
         </p>
-        <button
-          type="button"
-          className="danger"
-          disabled={busy}
-          onClick={removeAccount}
-        >
+        <button type="button" className="danger" disabled={busy} onClick={removeAccount}>
           회원 탈퇴
         </button>
       </div>

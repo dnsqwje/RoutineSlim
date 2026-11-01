@@ -1,58 +1,33 @@
 {
-  "/api/csrf": [
-    "src/api/apiClient.js"
-  ],
-  "/api/data/setting-": [
-    "src/hooks/useAccountSetting.js"
-  ],
-  "/api/data/subscriptions": [
-    "src/features/account/components/AccountDataBackup.jsx"
-  ],
+  "/api/csrf": ["src/api/apiClient.js"],
+  "/api/data/setting-": ["src/hooks/useAccountSetting.js"],
+  "/api/data/subscriptions": ["src/features/account/components/AccountDataBackup.jsx"],
   "/api/login": [
     "src/api/apiClient.js",
-    "src/api/serverDevAdapter.js",
+    "src/api/serverApiAdapter.js",
     "src/features/auth/LoginPage.jsx"
   ],
-  "/api/logout": [
-    "src/App.jsx",
-    "src/api/serverDevAdapter.js"
-  ],
+  "/api/logout": ["src/App.jsx", "src/api/serverApiAdapter.js"],
   "/api/me": [
     "src/App.jsx",
     "src/api/apiClient.js",
-    "src/api/serverDevAdapter.js",
+    "src/api/serverApiAdapter.js",
     "src/features/account/ProfilePage.jsx"
   ],
-  "/api/password": [
-    "src/features/account/ProfilePage.jsx"
-  ],
-  "/api/v1/": [
-    "src/shared/routineSlimClient.js"
-  ],
-  "/api/v1/activity/me": [
-    "src/features/community/CommunityActivityPage.jsx"
-  ],
-  "/api/v1/admin/content/": [
-    "src/features/admin/AdminPage.jsx"
-  ],
-  "/api/v1/admin/inquiries": [
-    "src/features/admin/AdminPage.jsx"
-  ],
-  "/api/v1/admin/inquiries/": [
-    "src/features/admin/AdminPage.jsx"
-  ],
+  "/api/password": ["src/features/account/ProfilePage.jsx"],
+  "/api/v1/": ["src/shared/routineSlimApiClient.js"],
+  "/api/v1/activity/me": ["src/features/community/CommunityActivityPage.jsx"],
+  "/api/v1/admin/content/": ["src/features/admin/AdminPage.jsx"],
+  "/api/v1/admin/inquiries": ["src/features/admin/AdminPage.jsx"],
+  "/api/v1/admin/inquiries/": ["src/features/admin/AdminPage.jsx"],
   "/api/v1/admin/members/${encodeURIComponent(x.id)}/suspension": [
     "src/features/admin/AdminPage.jsx"
   ],
   "/api/v1/admin/members?query=${encodeURIComponent(query)}&page=${page}&size=20": [
     "src/features/admin/AdminPage.jsx"
   ],
-  "/api/v1/admin/overview": [
-    "src/features/admin/AdminPage.jsx"
-  ],
-  "/api/v1/admin/plans": [
-    "src/features/admin/AdminPage.jsx"
-  ],
+  "/api/v1/admin/overview": ["src/features/admin/AdminPage.jsx"],
+  "/api/v1/admin/plans": ["src/features/admin/AdminPage.jsx"],
   "/api/v1/calendar/events?year=${year}&month=${Number(m)}": [
     "src/features/payments/PaymentCalendarPage.jsx"
   ],
@@ -60,9 +35,7 @@
     "src/features/subscriptions/components/SubscriptionEditor.jsx",
     "src/hooks/useServiceCatalog.js"
   ],
-  "/api/v1/community/draft": [
-    "src/features/community/CommunityPage.jsx"
-  ],
+  "/api/v1/community/draft": ["src/features/community/CommunityPage.jsx"],
   "/api/v1/community/moderation": [
     "src/App.jsx",
     "src/features/admin/components/CommunityReportModeration.jsx"
@@ -78,99 +51,48 @@
     "src/features/community/CommunityActivityPage.jsx",
     "src/features/community/CommunityPage.jsx"
   ],
-  "/api/v1/community/posts/${post.id}": [
-    "src/features/community/CommunityPage.jsx"
-  ],
-  "/api/v1/community/posts/${post.id}/comments": [
-    "src/features/community/CommunityPage.jsx"
-  ],
-  "/api/v1/community/posts/${post.id}/likes/count": [
-    "src/features/community/CommunityPage.jsx"
-  ],
-  "/api/v1/community/posts/${post.id}/views": [
-    "src/features/community/CommunityPage.jsx"
-  ],
-  "/api/v1/community/posts/${selected.id}": [
-    "src/features/community/CommunityPage.jsx"
-  ],
-  "/api/v1/community/posts/${selected.id}/comments": [
-    "src/features/community/CommunityPage.jsx"
-  ],
+  "/api/v1/community/posts/${post.id}": ["src/features/community/CommunityPage.jsx"],
+  "/api/v1/community/posts/${post.id}/comments": ["src/features/community/CommunityPage.jsx"],
+  "/api/v1/community/posts/${post.id}/likes/count": ["src/features/community/CommunityPage.jsx"],
+  "/api/v1/community/posts/${post.id}/views": ["src/features/community/CommunityPage.jsx"],
+  "/api/v1/community/posts/${selected.id}": ["src/features/community/CommunityPage.jsx"],
+  "/api/v1/community/posts/${selected.id}/comments": ["src/features/community/CommunityPage.jsx"],
   "/api/v1/community/posts/${selected.id}/comments/${c.id}": [
     "src/features/community/CommunityPage.jsx"
   ],
   "/api/v1/community/posts/${selected.id}/likes/toggle": [
     "src/features/community/CommunityPage.jsx"
   ],
-  "/api/v1/community/posts/${selected.id}/reports": [
-    "src/features/community/CommunityPage.jsx"
-  ],
+  "/api/v1/community/posts/${selected.id}/reports": ["src/features/community/CommunityPage.jsx"],
   "/api/v1/community/posts/${x.id}/likes/toggle": [
     "src/features/community/CommunityActivityPage.jsx"
   ],
-  "/api/v1/community/reports": [
-    "src/features/admin/components/CommunityReportModeration.jsx"
-  ],
+  "/api/v1/community/reports": ["src/features/admin/components/CommunityReportModeration.jsx"],
   "/api/v1/community/reports/${report.id}/resolve": [
     "src/features/admin/components/CommunityReportModeration.jsx"
   ],
-  "/api/v1/comparison/plans": [
-    "src/features/subscriptions/SubscriptionComparisonPage.jsx"
-  ],
-  "/api/v1/comparison/selection": [
-    "src/features/subscriptions/SubscriptionComparisonPage.jsx"
-  ],
+  "/api/v1/comparison/plans": ["src/features/subscriptions/SubscriptionComparisonPage.jsx"],
+  "/api/v1/comparison/selection": ["src/features/subscriptions/SubscriptionComparisonPage.jsx"],
   "/api/v1/expenses/summary": [
     "src/components/layout/SpendingSummaryPanel.jsx",
     "src/features/dashboard/DashboardPage.jsx",
     "src/features/savings/BudgetPage.jsx"
   ],
-  "/api/v1/goals": [
-    "src/features/savings/SavingsGoalPage.jsx"
-  ],
-  "/api/v1/goals/": [
-    "src/features/savings/SavingsGoalPage.jsx"
-  ],
-  "/api/v1/goals/${goal.id}/savings": [
-    "src/features/savings/SavingsGoalPage.jsx"
-  ],
-  "/api/v1/goals?month=": [
-    "src/features/savings/SavingsGoalPage.jsx"
-  ],
-  "/api/v1/members/me": [
-    "src/features/account/ProfilePage.jsx"
-  ],
-  "/api/v1/members/me/email": [
-    "src/features/account/ProfilePage.jsx"
-  ],
-  "/api/v1/members/me/email/send": [
-    "src/features/account/ProfilePage.jsx"
-  ],
-  "/api/v1/notifications": [
-    "src/App.jsx",
-    "src/features/notifications/NotificationCenterPage.jsx"
-  ],
-  "/api/v1/notifications/${x.id}": [
-    "src/features/notifications/NotificationCenterPage.jsx"
-  ],
-  "/api/v1/notifications/${x.id}/read": [
-    "src/features/notifications/NotificationCenterPage.jsx"
-  ],
-  "/api/v1/notifications/read-all": [
-    "src/features/notifications/NotificationCenterPage.jsx"
-  ],
-  "/api/v1/payments": [
-    "src/features/payments/PaymentHistoryPage.jsx"
-  ],
-  "/api/v1/payments/": [
-    "src/features/payments/PaymentHistoryPage.jsx"
-  ],
-  "/api/v1/payments/summary?month=": [
-    "src/features/savings/BudgetPage.jsx"
-  ],
-  "/api/v1/payments?month=": [
-    "src/features/payments/PaymentHistoryPage.jsx"
-  ],
+  "/api/v1/goals": ["src/features/savings/SavingsGoalPage.jsx"],
+  "/api/v1/goals/": ["src/features/savings/SavingsGoalPage.jsx"],
+  "/api/v1/goals/${goal.id}/savings": ["src/features/savings/SavingsGoalPage.jsx"],
+  "/api/v1/goals?month=": ["src/features/savings/SavingsGoalPage.jsx"],
+  "/api/v1/members/me": ["src/features/account/ProfilePage.jsx"],
+  "/api/v1/members/me/email": ["src/features/account/ProfilePage.jsx"],
+  "/api/v1/members/me/email/send": ["src/features/account/ProfilePage.jsx"],
+  "/api/v1/notifications": ["src/App.jsx", "src/features/notifications/NotificationCenterPage.jsx"],
+  "/api/v1/notifications/${x.id}": ["src/features/notifications/NotificationCenterPage.jsx"],
+  "/api/v1/notifications/${x.id}/read": ["src/features/notifications/NotificationCenterPage.jsx"],
+  "/api/v1/notifications/read-all": ["src/features/notifications/NotificationCenterPage.jsx"],
+  "/api/v1/payments": ["src/features/payments/PaymentHistoryPage.jsx"],
+  "/api/v1/payments/": ["src/features/payments/PaymentHistoryPage.jsx"],
+  "/api/v1/payments/summary?month=": ["src/features/savings/BudgetPage.jsx"],
+  "/api/v1/payments?month=": ["src/features/payments/PaymentHistoryPage.jsx"],
   "/api/v1/reminders": [
     "src/components/layout/SpendingSummaryPanel.jsx",
     "src/features/notifications/ReminderSettingsPage.jsx"
@@ -180,9 +102,7 @@
     "src/features/payments/PaymentHistoryPage.jsx",
     "src/features/reports/MonthlyReportPage.jsx"
   ],
-  "/api/v1/savings-entries/": [
-    "src/features/savings/SavingsGoalPage.jsx"
-  ],
+  "/api/v1/savings-entries/": ["src/features/savings/SavingsGoalPage.jsx"],
   "/api/v1/savings/summary": [
     "src/components/layout/SpendingSummaryPanel.jsx",
     "src/features/dashboard/DashboardPage.jsx"
@@ -195,40 +115,20 @@
     "src/features/savings/SavingsAnalysisPage.jsx",
     "src/features/subscriptions/SubscriptionListPage.jsx",
     "src/features/subscriptions/components/SubscriptionEditor.jsx",
-    "src/shared/routineSlimClient.js"
+    "src/shared/routineSlimApiClient.js"
   ],
-  "/api/v1/subscriptions${status ? ": [
-    "src/shared/routineSlimClient.js"
-  ],
+  "/api/v1/subscriptions${status ? ": ["src/shared/routineSlimApiClient.js"],
   "/api/v1/subscriptions/": [
     "src/features/savings/SavingsAnalysisPage.jsx",
     "src/features/subscriptions/SubscriptionListPage.jsx"
   ],
-  "/api/v1/subscriptions/${id}": [
-    "src/shared/routineSlimClient.js"
-  ],
-  "/api/v1/subscriptions/${id}/detail": [
-    "src/features/subscriptions/SubscriptionDetailPage.jsx"
-  ],
-  "/api/v1/subscriptions/${id}/note": [
-    "src/features/subscriptions/SubscriptionDetailPage.jsx"
-  ],
-  "/api/v1/subscriptions/scan": [
-    "src/shared/routineSlimClient.js"
-  ],
-  "/api/v1/support/": [
-    "src/features/support/SupportCenterPage.jsx"
-  ],
-  "/api/v1/support/inquiries": [
-    "src/features/support/SupportCenterPage.jsx"
-  ],
-  "/api/v1/support/inquiries/": [
-    "src/features/support/SupportCenterPage.jsx"
-  ],
-  "/api/v1/trials": [
-    "src/features/subscriptions/FreeTrialPage.jsx"
-  ],
-  "/api/v1/trials/": [
-    "src/features/subscriptions/FreeTrialPage.jsx"
-  ]
+  "/api/v1/subscriptions/${id}": ["src/shared/routineSlimApiClient.js"],
+  "/api/v1/subscriptions/${id}/detail": ["src/features/subscriptions/SubscriptionDetailPage.jsx"],
+  "/api/v1/subscriptions/${id}/note": ["src/features/subscriptions/SubscriptionDetailPage.jsx"],
+  "/api/v1/subscriptions/scan": ["src/shared/routineSlimApiClient.js"],
+  "/api/v1/support/": ["src/features/support/SupportCenterPage.jsx"],
+  "/api/v1/support/inquiries": ["src/features/support/SupportCenterPage.jsx"],
+  "/api/v1/support/inquiries/": ["src/features/support/SupportCenterPage.jsx"],
+  "/api/v1/trials": ["src/features/subscriptions/FreeTrialPage.jsx"],
+  "/api/v1/trials/": ["src/features/subscriptions/FreeTrialPage.jsx"]
 }

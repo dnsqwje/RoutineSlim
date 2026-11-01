@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { request, money } from "../../api/apiClient";
+import { apiRequest, formatWon } from "../../api/apiClient";
 import ServiceBadge from "../../components/common/ServiceBadge";
 import CategorySpendingChart from "../../components/charts/CategorySpendingChart";
 import SubscriptionEditor from "../subscriptions/components/SubscriptionEditor";
-import {
-  monthlyAmount,
-  savingsAnalysis,
-} from "../../utils/subscriptionCalculations";
+import { monthlyAmount, savingsAnalysis } from "../../utils/subscriptionCalculations";
 export default function SavingsAnalysisPage() {
   const [subs, setSubs] = useState([]),
     [error, setError] = useState(""),
@@ -16,7 +13,7 @@ export default function SavingsAnalysisPage() {
     [open, setOpen] = useState(false);
   useEffect(() => {
     let active = true;
-    request("/api/v1/subscriptions")
+    apiRequest("/api/v1/subscriptions")
       .then((rows) => {
         if (active) setSubs(rows);
       })
@@ -40,7 +37,7 @@ export default function SavingsAnalysisPage() {
     setBusy(true);
     setError("");
     try {
-      const updated = await request("/api/v1/subscriptions/" + s.id, {
+      const updated = await apiRequest("/api/v1/subscriptions/" + s.id, {
         method: "PUT",
         body: { ...s, status: s.status === "review" ? "active" : "review" },
       });
@@ -53,9 +50,7 @@ export default function SavingsAnalysisPage() {
     }
   }
   const max = Math.max(1, analysis.total),
-    percent = analysis.total
-      ? Math.round((analysis.saved / analysis.total) * 100)
-      : 0;
+    percent = analysis.total ? Math.round((analysis.saved / analysis.total) * 100) : 0;
   return (
     <section>
       <div className="heading dashboard-heading">
@@ -81,7 +76,7 @@ export default function SavingsAnalysisPage() {
       <div className="stats budget-stats">
         <article className="stat">
           <span>월 최대 절감 후보 금액</span>
-          <strong>{money(Math.round(analysis.saved))}</strong>
+          <strong>{formatWon(Math.round(analysis.saved))}</strong>
           <small>검토 구독을 해지한다고 가정한 금액</small>
         </article>
         <article className="stat">
@@ -92,7 +87,7 @@ export default function SavingsAnalysisPage() {
         <article className="stat">
           <span>절약 검토 항목</span>
           <strong>{analysis.reviewCount}개</strong>
-          <small>연간 최대 {money(Math.round(analysis.saved * 12))}</small>
+          <small>연간 최대 {formatWon(Math.round(analysis.saved * 12))}</small>
         </article>
       </div>
       <div className="savings-workspace">
@@ -115,10 +110,7 @@ export default function SavingsAnalysisPage() {
                 <ServiceBadge name={x.name} />
                 <div className="candidate-info">
                   <h2>
-                    {x.name}{" "}
-                    {analysis.duplicateIds.has(x.id) && (
-                      <small>중복 카테고리</small>
-                    )}
+                    {x.name} {analysis.duplicateIds.has(x.id) && <small>중복 카테고리</small>}
                   </h2>
                   <p>
                     {analysis.duplicateIds.has(x.id)
@@ -128,7 +120,7 @@ export default function SavingsAnalysisPage() {
                 </div>
                 <div className="candidate-price">
                   <small>월 환산 요금</small>
-                  <strong>{money(Math.round(monthlyAmount(x)))}</strong>
+                  <strong>{formatWon(Math.round(monthlyAmount(x)))}</strong>
                   <b>{x.status === "review" ? "검토 중" : "검토 가능"}</b>
                 </div>
                 <div className="candidate-actions">
@@ -159,8 +151,8 @@ export default function SavingsAnalysisPage() {
             )}
           </section>
           <p className="muted">
-            같은 카테고리라는 사실만으로 불필요한 구독이라고 판단하지 않습니다.
-            실제 해지와 결제 중단은 제공 업체에서 진행해주세요.
+            같은 카테고리라는 사실만으로 불필요한 구독이라고 판단하지 않습니다. 실제 해지와 결제
+            중단은 제공 업체에서 진행해주세요.
           </p>
         </div>
         <aside>
@@ -173,36 +165,33 @@ export default function SavingsAnalysisPage() {
             <div
               className="savings-simulation"
               role="img"
-              aria-label={`현재 월 지출 ${money(Math.round(analysis.total))}, 검토 항목 제외 시 ${money(Math.round(analysis.remaining))}`}
+              aria-label={`현재 월 지출 ${formatWon(Math.round(analysis.total))}, 검토 항목 제외 시 ${formatWon(Math.round(analysis.remaining))}`}
             >
               <div>
                 <div className="simulation-track">
                   <i style={{ height: (analysis.total / max) * 100 + "%" }} />
                 </div>
-                <b>{money(Math.round(analysis.total))}</b>
+                <b>{formatWon(Math.round(analysis.total))}</b>
                 <small>현재 월 지출</small>
               </div>
               <div>
                 <div className="simulation-track">
-                  <i
-                    className="after"
-                    style={{ height: (analysis.remaining / max) * 100 + "%" }}
-                  />
+                  <i className="after" style={{ height: (analysis.remaining / max) * 100 + "%" }} />
                 </div>
-                <b>{money(Math.round(analysis.remaining))}</b>
+                <b>{formatWon(Math.round(analysis.remaining))}</b>
                 <small>검토 항목 제외 시</small>
               </div>
             </div>
             <p className="savings-result">
-              월 최대 {money(Math.round(analysis.saved))} 절감 후보 ({percent}%)
+              월 최대 {formatWon(Math.round(analysis.saved))} 절감 후보 ({percent}%)
             </p>
             <p className="muted">예상 금액이며 실제 절약 실적은 아닙니다.</p>
           </section>
           <section className="rail-tip">
             <h2>맞춤 절감 팁</h2>
             <p>
-              중복 카테고리와 사용 빈도를 먼저 점검하고, 연간 결제는 남은 기간과
-              환불 조건을 확인하세요.
+              중복 카테고리와 사용 빈도를 먼저 점검하고, 연간 결제는 남은 기간과 환불 조건을
+              확인하세요.
             </p>
           </section>
         </aside>
@@ -213,9 +202,7 @@ export default function SavingsAnalysisPage() {
           onClose={() => setOpen(false)}
           onSaved={(saved) => {
             setSubs((rows) =>
-              editing
-                ? rows.map((x) => (x.id === saved.id ? saved : x))
-                : [saved, ...rows],
+              editing ? rows.map((x) => (x.id === saved.id ? saved : x)) : [saved, ...rows],
             );
             setOpen(false);
             setEditing(null);

@@ -1,12 +1,12 @@
-import { requestServerDev } from './serverDevAdapter';
-const baseUrl = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
-/** Centralized JSON API client. Session cookies and CSRF tokens stay same-origin. */
-export async function request(path, options = {}) {
-  if (import.meta.env.VITE_API_MODE === 'server-dev') return requestServerDev(path, options);
+import { requestServerApi } from "./serverApiAdapter";
+import { getApiConfig } from "../config/apiConfig";
+/** Server-dev is the default. The optional original cookie backend uses CSRF. */
+export async function apiRequest(path, options = {}) {
+  const { mode, baseUrl } = getApiConfig();
+  if (mode === "server-dev") return requestServerApi(path, options);
   const method = (options.method || "GET").toUpperCase();
   const headers = { ...options.headers };
-  if (!path.startsWith("/api/"))
-    throw new Error("허용되지 않은 API 주소입니다.");
+  if (!path.startsWith("/api/")) throw new Error("허용되지 않은 API 주소입니다.");
   let body = options.body;
   if (body != null && typeof body !== "string" && !(body instanceof FormData)) {
     headers["Content-Type"] = "application/json";
@@ -18,9 +18,7 @@ export async function request(path, options = {}) {
       cache: "no-store",
     });
     if (!csrfResponse.ok)
-      throw new Error(
-        "보안 토큰을 가져오지 못했습니다. 새로고침 후 다시 시도하세요.",
-      );
+      throw new Error("보안 토큰을 가져오지 못했습니다. 새로고침 후 다시 시도하세요.");
     const csrf = await csrfResponse.json();
     const token = csrf.token || csrf.csrfToken || csrf._csrf?.token;
     if (!token) throw new Error("보안 토큰이 비어 있습니다.");
@@ -49,16 +47,13 @@ export async function request(path, options = {}) {
       typeof window !== "undefined"
     )
       window.dispatchEvent(new Event("routineslim:unauthorized"));
-    const detail =
-      value && typeof value === "object" ? value.message || value.error : null;
-    throw new Error(
-      typeof detail === "string" ? detail : `요청 실패 (${response.status})`,
-    );
+    const detail = value && typeof value === "object" ? value.message || value.error : null;
+    throw new Error(typeof detail === "string" ? detail : `요청 실패 (${response.status})`);
   }
   return value;
 }
-export const money = (n) => Number(n || 0).toLocaleString("ko-KR") + "원";
-export const today = () => {
+export const formatWon = (n) => Number(n || 0).toLocaleString("ko-KR") + "원";
+export const getTodayDate = () => {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 };

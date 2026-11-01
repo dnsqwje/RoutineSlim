@@ -2,16 +2,11 @@ import MonthlySpendingChart from "../../components/charts/MonthlySpendingChart";
 import CategorySpendingChart from "../../components/charts/CategorySpendingChart";
 import { useApiResource } from "../../hooks/useApiResource";
 import React, { useState } from "react";
-import { money, today } from "../../api/apiClient";
+import { formatWon, getTodayDate } from "../../api/apiClient";
 import { exportCsv } from "../../utils/csvExport";
-import {
-  Heading,
-  Status,
-  Stats,
-  Empty,
-} from "../../components/common/SharedUI";
+import { Heading, Status, Stats, Empty } from "../../components/common/SharedUI";
 export default function MonthlyReportPage({ navigate }) {
-  const [month, setMonth] = useState(today().slice(0, 7)),
+  const [month, setMonth] = useState(getTodayDate().slice(0, 7)),
     r = useApiResource("/api/v1/reports/monthly?month=" + month),
     d = r.data;
   return (
@@ -54,18 +49,15 @@ export default function MonthlyReportPage({ navigate }) {
                 : d.difference === 0
                   ? "지난달과 지출이 같아요."
                   : d.difference < 0
-                    ? `지난달보다 ${money(-d.difference)} 줄었어요.`
-                    : `지난달보다 ${money(d.difference)} 늘었어요.`}
+                    ? `지난달보다 ${formatWon(-d.difference)} 줄었어요.`
+                    : `지난달보다 ${formatWon(d.difference)} 늘었어요.`}
             </h2>
             <p>실제 결제 기록 기준이며, 예상 구독료와는 다를 수 있습니다.</p>
           </div>
           <Stats
             items={[
-              ["이번 달 실제 지출", money(d.total)],
-              [
-                "지난달 실제 지출",
-                d.hasPrevious ? money(d.previousTotal) : "기록 없음",
-              ],
+              ["이번 달 실제 지출", formatWon(d.total)],
+              ["지난달 실제 지출", d.hasPrevious ? formatWon(d.previousTotal) : "기록 없음"],
               ["결제 기록", d.paymentCount + "건"],
             ]}
           />
@@ -73,9 +65,7 @@ export default function MonthlyReportPage({ navigate }) {
             <section className="panel">
               <h2>최근 6개월 실제 지출</h2>
               <MonthlySpendingChart history={d.history} />
-              <p className="muted">
-                결제 기록이 없는 달은 합계가 0원으로 표시됩니다.
-              </p>
+              <p className="muted">결제 기록이 없는 달은 합계가 0원으로 표시됩니다.</p>
             </section>
             <aside>
               <section className="panel">
@@ -85,15 +75,13 @@ export default function MonthlyReportPage({ navigate }) {
                   d.categories.map((x) => (
                     <div className="item" key={x.category}>
                       <span>{x.category}</span>
-                      <b>{money(x.amount)}</b>
+                      <b>{formatWon(x.amount)}</b>
                     </div>
                   ))
                 ) : (
                   <Empty>이번 달 결제 기록이 없습니다.</Empty>
                 )}
-                <p className="muted">
-                  구독과 연결되지 않은 수동 결제는 기타로 분류합니다.
-                </p>
+                <p className="muted">구독과 연결되지 않은 수동 결제는 기타로 분류합니다.</p>
               </section>
               <section className="panel">
                 <h2>다음 달도 가볍게</h2>

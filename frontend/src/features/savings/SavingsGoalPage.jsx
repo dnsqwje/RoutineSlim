@@ -1,6 +1,6 @@
 import { useApiResource } from "../../hooks/useApiResource";
 import React, { useState } from "react";
-import { request, money, today } from "../../api/apiClient";
+import { apiRequest, formatWon, getTodayDate } from "../../api/apiClient";
 import {
   Heading,
   Status,
@@ -11,7 +11,7 @@ import {
   FormActions,
 } from "../../components/common/SharedUI";
 export default function SavingsGoalPage({ navigate }) {
-  const [month, setMonth] = useState(today().slice(0, 7)),
+  const [month, setMonth] = useState(getTodayDate().slice(0, 7)),
     r = useApiResource("/api/v1/goals?month=" + month),
     [form, setForm] = useState(null),
     [entry, setEntry] = useState(null);
@@ -38,7 +38,7 @@ export default function SavingsGoalPage({ navigate }) {
         .split("\n")
         .map((x) => x.trim())
         .filter(Boolean);
-      await request("/api/v1/goals" + (form.id ? "/" + form.id : ""), {
+      await apiRequest("/api/v1/goals" + (form.id ? "/" + form.id : ""), {
         method: form.id ? "PUT" : "POST",
         body: {
           title: form.title,
@@ -59,7 +59,7 @@ export default function SavingsGoalPage({ navigate }) {
   async function add(e) {
     e.preventDefault();
     await r.run(async () => {
-      await request(`/api/v1/goals/${goal.id}/savings`, {
+      await apiRequest(`/api/v1/goals/${goal.id}/savings`, {
         method: "POST",
         body: { ...entry, amount: Number(entry.amount) },
       });
@@ -70,11 +70,9 @@ export default function SavingsGoalPage({ navigate }) {
   async function toggle(i) {
     await r.run(async () => {
       const completed = (goal.tasks || []).map((_, index) =>
-        index === i
-          ? !goal.completed?.[index]
-          : Boolean(goal.completed?.[index]),
+        index === i ? !goal.completed?.[index] : Boolean(goal.completed?.[index]),
       );
-      await request("/api/v1/goals/" + goal.id, {
+      await apiRequest("/api/v1/goals/" + goal.id, {
         method: "PUT",
         body: { ...goal, completed },
       });
@@ -84,14 +82,14 @@ export default function SavingsGoalPage({ navigate }) {
   async function removeEntry(id) {
     if (!confirm("절약 기록을 삭제할까요?")) return;
     await r.run(async () => {
-      await request("/api/v1/savings-entries/" + id, { method: "DELETE" });
+      await apiRequest("/api/v1/savings-entries/" + id, { method: "DELETE" });
       await r.reload();
     });
   }
   async function deleteGoal() {
     if (!confirm("이 목표와 연결된 절약 내역을 모두 삭제할까요?")) return;
     await r.run(async () => {
-      await request("/api/v1/goals/" + goal.id, { method: "DELETE" });
+      await apiRequest("/api/v1/goals/" + goal.id, { method: "DELETE" });
       await r.reload();
     });
   }
@@ -118,8 +116,8 @@ export default function SavingsGoalPage({ navigate }) {
         <>
           <Stats
             items={[
-              ["이번 달 절약 목표", money(goal.target)],
-              ["기록한 절약 금액", money(d.saved)],
+              ["이번 달 절약 목표", formatWon(goal.target)],
+              ["기록한 절약 금액", formatWon(d.saved)],
               ["목표 달성률", d.percent + "%"],
             ]}
           />
@@ -128,16 +126,12 @@ export default function SavingsGoalPage({ navigate }) {
               <section className="panel">
                 <div className="panel-heading">
                   <h2>{goal.title}</h2>
-                  <button
-                    className="danger small"
-                    disabled={r.busy}
-                    onClick={deleteGoal}
-                  >
+                  <button className="danger small" disabled={r.busy} onClick={deleteGoal}>
                     목표 삭제
                   </button>
                 </div>
                 <div className="feature-goal-total">
-                  {money(d.saved)} <small>/ {money(goal.target)}</small>
+                  {formatWon(d.saved)} <small>/ {formatWon(goal.target)}</small>
                 </div>
                 <progress
                   className="budget-progress"
@@ -145,8 +139,7 @@ export default function SavingsGoalPage({ navigate }) {
                   value={Math.min(goal.target, d.saved)}
                 />
                 <p className="muted">
-                  목표까지 {money(Math.max(0, goal.target - d.saved))}{" "}
-                  남았습니다.
+                  목표까지 {formatWon(Math.max(0, goal.target - d.saved))} 남았습니다.
                 </p>
                 <button
                   className="primary"
@@ -155,8 +148,7 @@ export default function SavingsGoalPage({ navigate }) {
                     setEntry({
                       title: "",
                       amount: "",
-                      date:
-                        month === today().slice(0, 7) ? today() : month + "-01",
+                      date: month === getTodayDate().slice(0, 7) ? getTodayDate() : month + "-01",
                     });
                   }}
                 >
@@ -192,7 +184,7 @@ export default function SavingsGoalPage({ navigate }) {
                         <b>{x.title}</b>
                         <p>{x.date}</p>
                       </div>
-                      <strong>{money(x.amount)}</strong>
+                      <strong>{formatWon(x.amount)}</strong>
                       <button
                         className="danger small"
                         disabled={r.busy}
@@ -208,13 +200,8 @@ export default function SavingsGoalPage({ navigate }) {
               </section>
               <section className="panel">
                 <h2>다음으로 확인해보세요</h2>
-                <p className="muted">
-                  다가오는 무료체험 종료일부터 확인해볼까요?
-                </p>
-                <button
-                  className="secondary"
-                  onClick={() => navigate("trials")}
-                >
+                <p className="muted">다가오는 무료체험 종료일부터 확인해볼까요?</p>
+                <button className="secondary" onClick={() => navigate("trials")}>
                   무료체험 관리 →
                 </button>
               </section>
@@ -229,11 +216,7 @@ export default function SavingsGoalPage({ navigate }) {
         )
       )}
       {form && (
-        <Modal
-          title="절약 목표 설정"
-          error={r.error}
-          onClose={() => !r.busy && setForm(null)}
-        >
+        <Modal title="절약 목표 설정" error={r.error} onClose={() => !r.busy && setForm(null)}>
           <form onSubmit={save} className="feature-form">
             <Field label="목표 이름">
               <input
@@ -266,9 +249,7 @@ export default function SavingsGoalPage({ navigate }) {
                 maxLength={2400}
                 rows={5}
                 value={form.tasksText}
-                onChange={(e) =>
-                  setForm({ ...form, tasksText: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, tasksText: e.target.value })}
               />
             </Field>
             <FormActions busy={r.busy} onCancel={() => setForm(null)} />
@@ -276,11 +257,7 @@ export default function SavingsGoalPage({ navigate }) {
         </Modal>
       )}
       {entry && (
-        <Modal
-          title="절약 내역 기록"
-          error={r.error}
-          onClose={() => !r.busy && setEntry(null)}
-        >
+        <Modal title="절약 내역 기록" error={r.error} onClose={() => !r.busy && setEntry(null)}>
           <form onSubmit={add} className="feature-form">
             <Field label="절약한 내용">
               <input
@@ -308,11 +285,7 @@ export default function SavingsGoalPage({ navigate }) {
                 onChange={(e) => setEntry({ ...entry, date: e.target.value })}
               />
             </Field>
-            <FormActions
-              busy={r.busy}
-              onCancel={() => setEntry(null)}
-              label="기록하기"
-            />
+            <FormActions busy={r.busy} onCancel={() => setEntry(null)} label="기록하기" />
           </form>
         </Modal>
       )}

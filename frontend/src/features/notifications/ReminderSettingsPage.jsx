@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAccountSetting } from "../../hooks/useAccountSetting";
 import CommunityReportModeration from "../admin/components/CommunityReportModeration";
 import AccountDataBackup from "../account/components/AccountDataBackup";
-import { request, money } from "../../api/apiClient";
+import { apiRequest, formatWon } from "../../api/apiClient";
 export default function ReminderSettingsPage({ user }) {
   const setting = useAccountSetting(user, "reminder-days", 7);
   const days = Number(setting.value),
@@ -11,7 +11,7 @@ export default function ReminderSettingsPage({ user }) {
     [error, setError] = useState(""),
     [saved, setSaved] = useState(false);
   useEffect(() => {
-    request("/api/v1/reminders")
+    apiRequest("/api/v1/reminders")
       .then(setItems)
       .catch((e) => setError(e.message));
   }, []);
@@ -56,8 +56,7 @@ export default function ReminderSettingsPage({ user }) {
         </form>
         {saved && <p role="status">계정에 알림 표시 설정을 저장했습니다.</p>}
         <p className="muted">
-          현재 서버는 7일 이내 예정 결제만 제공합니다. 이메일·문자·푸시 알림은
-          발송하지 않습니다.
+          현재 서버는 7일 이내 예정 결제만 제공합니다. 이메일·문자·푸시 알림은 발송하지 않습니다.
         </p>
       </div>
       {(error || setting.error) && (
@@ -75,7 +74,7 @@ export default function ReminderSettingsPage({ user }) {
                 <span>
                   {x.name} · {x.date} ({x.daysUntil}일 후)
                 </span>
-                <b>{money(x.amount)}</b>
+                <b>{formatWon(x.amount)}</b>
               </div>
             ))
         ) : (

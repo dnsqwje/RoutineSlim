@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { request } from "../api/apiClient";
+import { apiRequest } from "../api/apiClient";
 export function useApiResource(path) {
   const [result, setResult] = useState({ path: null, data: null });
   const data = result.path === path ? result.data : null;
@@ -18,7 +18,7 @@ export function useApiResource(path) {
     const current = ++sequence.current;
     setLoading(true);
     try {
-      const value = await request(path);
+      const value = await apiRequest(path);
       if (current === sequence.current) {
         setData(value);
         setError("");

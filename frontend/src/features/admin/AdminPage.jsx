@@ -1,6 +1,6 @@
 import { useApiResource } from "../../hooks/useApiResource";
 import React, { useState } from "react";
-import { request, money } from "../../api/apiClient";
+import { apiRequest, formatWon } from "../../api/apiClient";
 import CommunityReportModeration from "./components/CommunityReportModeration";
 import {
   Heading,
@@ -48,8 +48,7 @@ export default function AdminPage({ user }) {
               active: true,
             },
       );
-    else if (tab === "inquiries")
-      setForm({ ...item, answer: item.answer || "" });
+    else if (tab === "inquiries") setForm({ ...item, answer: item.answer || "" });
     else
       setForm(
         item || {
@@ -91,7 +90,7 @@ export default function AdminPage({ user }) {
           published: form.published,
         };
       }
-      await request(url, { method: form.id ? "PUT" : "POST", body });
+      await apiRequest(url, { method: form.id ? "PUT" : "POST", body });
       setForm(null);
       await r.reload();
       await overview.reload();
@@ -100,7 +99,7 @@ export default function AdminPage({ user }) {
   async function remove(x) {
     if (!confirm("이 항목을 삭제할까요?")) return;
     await r.run(async () => {
-      await request("/api/v1/admin/content/" + kind + "/" + x.id, {
+      await apiRequest("/api/v1/admin/content/" + kind + "/" + x.id, {
         method: "DELETE",
       });
       await r.reload();
@@ -108,19 +107,13 @@ export default function AdminPage({ user }) {
     });
   }
   async function suspend(x) {
-    if (
-      !confirm(
-        x.suspended
-          ? "이 회원의 이용 정지를 해제할까요?"
-          : "이 회원을 이용 정지할까요?",
-      )
-    )
+    if (!confirm(x.suspended ? "이 회원의 이용 정지를 해제할까요?" : "이 회원을 이용 정지할까요?"))
       return;
     await r.run(async () => {
-      await request(
-        `/api/v1/admin/members/${encodeURIComponent(x.id)}/suspension`,
-        { method: "PUT", body: { suspended: !x.suspended } },
-      );
+      await apiRequest(`/api/v1/admin/members/${encodeURIComponent(x.id)}/suspension`, {
+        method: "PUT",
+        body: { suspended: !x.suspended },
+      });
       await r.reload();
       await overview.reload();
     });
@@ -209,11 +202,7 @@ export default function AdminPage({ user }) {
                     <p>{x.email || "이메일 미등록"}</p>
                   </div>
                   <span className="feature-pill">
-                    {x.role === "ADMIN"
-                      ? "관리자"
-                      : x.suspended
-                        ? "이용 정지"
-                        : "일반 회원"}
+                    {x.role === "ADMIN" ? "관리자" : x.suspended ? "이용 정지" : "일반 회원"}
                   </span>
                   <button
                     className={x.suspended ? "secondary small" : "danger small"}
@@ -224,9 +213,7 @@ export default function AdminPage({ user }) {
                   </button>
                 </div>
               ))}
-              {r.data && !r.data.content.length && (
-                <Empty>검색 결과가 없습니다.</Empty>
-              )}
+              {r.data && !r.data.content.length && <Empty>검색 결과가 없습니다.</Empty>}
               <div className="feature-pagination">
                 <button
                   className="secondary small"
@@ -270,35 +257,21 @@ export default function AdminPage({ user }) {
             (r.data || []).map((x) => (
               <div className="feature-row" key={x.id}>
                 <div className="feature-grow">
-                  <b>
-                    {tab === "plans" ? x.service + " · " + x.plan : x.title}
-                  </b>
+                  <b>{tab === "plans" ? x.service + " · " + x.plan : x.title}</b>
                   <p>
                     {x.category} ·{" "}
                     {tab === "plans"
-                      ? money(x.amount) +
-                        " / " +
-                        (x.cycle === "monthly" ? "월" : "년")
+                      ? formatWon(x.amount) + " / " + (x.cycle === "monthly" ? "월" : "년")
                       : dateText(x.updatedAt)}
                   </p>
                 </div>
                 <span className="feature-pill">
-                  {(tab === "plans" ? x.active : x.published)
-                    ? "공개"
-                    : "비공개"}
+                  {(tab === "plans" ? x.active : x.published) ? "공개" : "비공개"}
                 </span>
-                <button
-                  className="secondary small"
-                  disabled={r.busy}
-                  onClick={() => open(x)}
-                >
+                <button className="secondary small" disabled={r.busy} onClick={() => open(x)}>
                   수정
                 </button>
-                <button
-                  className="danger small"
-                  disabled={r.busy}
-                  onClick={() => remove(x)}
-                >
+                <button className="danger small" disabled={r.busy} onClick={() => remove(x)}>
                   삭제
                 </button>
               </div>
@@ -334,9 +307,7 @@ export default function AdminPage({ user }) {
                     maxLength={5000}
                     rows={6}
                     value={form.answer}
-                    onChange={(e) =>
-                      setForm({ ...form, answer: e.target.value })
-                    }
+                    onChange={(e) => setForm({ ...form, answer: e.target.value })}
                   />
                 </Field>
               </>
@@ -347,9 +318,7 @@ export default function AdminPage({ user }) {
                     required
                     maxLength={80}
                     value={form.service}
-                    onChange={(e) =>
-                      setForm({ ...form, service: e.target.value })
-                    }
+                    onChange={(e) => setForm({ ...form, service: e.target.value })}
                   />
                 </Field>
                 <Field label="요금제 이름">
@@ -365,9 +334,7 @@ export default function AdminPage({ user }) {
                     required
                     maxLength={40}
                     value={form.category}
-                    onChange={(e) =>
-                      setForm({ ...form, category: e.target.value })
-                    }
+                    onChange={(e) => setForm({ ...form, category: e.target.value })}
                   />
                 </Field>
                 <Field label="금액">
@@ -377,17 +344,13 @@ export default function AdminPage({ user }) {
                     min="0"
                     max="1000000000"
                     value={form.amount}
-                    onChange={(e) =>
-                      setForm({ ...form, amount: e.target.value })
-                    }
+                    onChange={(e) => setForm({ ...form, amount: e.target.value })}
                   />
                 </Field>
                 <Field label="결제 주기">
                   <select
                     value={form.cycle}
-                    onChange={(e) =>
-                      setForm({ ...form, cycle: e.target.value })
-                    }
+                    onChange={(e) => setForm({ ...form, cycle: e.target.value })}
                   >
                     <option value="monthly">매월</option>
                     <option value="yearly">매년</option>
@@ -398,9 +361,7 @@ export default function AdminPage({ user }) {
                     maxLength={1440}
                     rows={4}
                     value={form.featuresText}
-                    onChange={(e) =>
-                      setForm({ ...form, featuresText: e.target.value })
-                    }
+                    onChange={(e) => setForm({ ...form, featuresText: e.target.value })}
                   />
                 </Field>
                 <Field label="공식 출처 주소">
@@ -408,9 +369,7 @@ export default function AdminPage({ user }) {
                     type="url"
                     maxLength={500}
                     value={form.sourceUrl}
-                    onChange={(e) =>
-                      setForm({ ...form, sourceUrl: e.target.value })
-                    }
+                    onChange={(e) => setForm({ ...form, sourceUrl: e.target.value })}
                     placeholder="https://..."
                   />
                 </Field>
@@ -418,9 +377,7 @@ export default function AdminPage({ user }) {
                   <input
                     type="checkbox"
                     checked={form.active}
-                    onChange={(e) =>
-                      setForm({ ...form, active: e.target.checked })
-                    }
+                    onChange={(e) => setForm({ ...form, active: e.target.checked })}
                   />
                   공개
                 </label>
@@ -432,9 +389,7 @@ export default function AdminPage({ user }) {
                     required
                     maxLength={120}
                     value={form.title}
-                    onChange={(e) =>
-                      setForm({ ...form, title: e.target.value })
-                    }
+                    onChange={(e) => setForm({ ...form, title: e.target.value })}
                   />
                 </Field>
                 <Field label="카테고리">
@@ -442,9 +397,7 @@ export default function AdminPage({ user }) {
                     required
                     maxLength={40}
                     value={form.category}
-                    onChange={(e) =>
-                      setForm({ ...form, category: e.target.value })
-                    }
+                    onChange={(e) => setForm({ ...form, category: e.target.value })}
                   />
                 </Field>
                 <Field label="내용">
@@ -453,18 +406,14 @@ export default function AdminPage({ user }) {
                     maxLength={10000}
                     rows={8}
                     value={form.content}
-                    onChange={(e) =>
-                      setForm({ ...form, content: e.target.value })
-                    }
+                    onChange={(e) => setForm({ ...form, content: e.target.value })}
                   />
                 </Field>
                 <label className="feature-task">
                   <input
                     type="checkbox"
                     checked={form.published}
-                    onChange={(e) =>
-                      setForm({ ...form, published: e.target.checked })
-                    }
+                    onChange={(e) => setForm({ ...form, published: e.target.checked })}
                   />
                   공개
                 </label>

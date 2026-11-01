@@ -1,8 +1,8 @@
 # 서버 연결 범위
 
-프론트엔드 화면·기능의 원본은 이번에 첨부된 `frontend.zip`입니다. 기본 `original` 모드는 해당 웹의 API 요청과 세션 쿠키·CSRF 흐름을 유지합니다. 모드 선택은 `.env.local`의 `VITE_API_MODE`로 합니다. 실행 중 변경했다면 Vite를 재시작합니다.
+프론트엔드 화면·기능의 원본은 이번에 첨부된 `frontend.zip`입니다. 기본 `server-dev` 모드는 첨부 서버 규격을 따르며 CSRF 사전 요청을 하지 않습니다. 기존 쿠키 서버용 `original` 모드는 명시적으로 선택할 때만 사용합니다. 모드 선택은 `.env.local`의 `VITE_API_MODE`로 합니다. 실행 중 변경했다면 Vite를 재시작합니다.
 
-## 1. original — 원본 전체 기능의 계약 유지 (기본값)
+## 1. original — 기존 쿠키 서버용 선택 모드
 
 현재 포함된 화면과 기능은 다음과 같습니다. 가입·소셜 로그인은 사용자의 요청으로 앱의 현재 가용성에 맞췄습니다.
 
@@ -17,38 +17,38 @@
 
 주요 계약:
 
-| 기능 | 원본 웹의 API |
-| --- | --- |
-| 로그인 세션 | `GET /api/me`, `POST /api/login`, `POST /api/logout` |
-| CSRF | `GET /api/csrf` → `{ token, headerName }` (변경 요청 전에 획득) |
-| 구독 목록/등록 | `GET/POST /api/v1/subscriptions` |
-| 구독 수정/삭제 | `PUT/DELETE /api/v1/subscriptions/{id}` |
-| 구독 상세/메모 | `GET .../{id}/detail`, `PUT .../{id}/note` |
-| 카탈로그 | `GET /api/v1/catalog` |
-| 홈/월간 결산 | `/api/v1/expenses/summary`, `/api/v1/savings/summary`, `/api/v1/reports/monthly` |
-| 캘린더 | `/api/v1/calendar/events?year=...&month=...` |
-| 결제 기록 | `/api/v1/payments` |
-| 커뮤니티 | `/api/v1/community/posts` 및 댓글·좋아요·신고 하위 경로 |
-| 회원정보 | `/api/v1/members/me` |
-| 설정 | `/api/data/setting-{name}` |
-| 알림 | `/api/v1/notifications`, `/api/v1/reminders` |
+| 기능           | 원본 웹의 API                                                                    |
+| -------------- | -------------------------------------------------------------------------------- |
+| 로그인 세션    | `GET /api/me`, `POST /api/login`, `POST /api/logout`                             |
+| CSRF           | `GET /api/csrf` → `{ token, headerName }` (변경 요청 전에 획득)                  |
+| 구독 목록/등록 | `GET/POST /api/v1/subscriptions`                                                 |
+| 구독 수정/삭제 | `PUT/DELETE /api/v1/subscriptions/{id}`                                          |
+| 구독 상세/메모 | `GET .../{id}/detail`, `PUT .../{id}/note`                                       |
+| 카탈로그       | `GET /api/v1/catalog`                                                            |
+| 홈/월간 결산   | `/api/v1/expenses/summary`, `/api/v1/savings/summary`, `/api/v1/reports/monthly` |
+| 캘린더         | `/api/v1/calendar/events?year=...&month=...`                                     |
+| 결제 기록      | `/api/v1/payments`                                                               |
+| 커뮤니티       | `/api/v1/community/posts` 및 댓글·좋아요·신고 하위 경로                          |
+| 회원정보       | `/api/v1/members/me`                                                             |
+| 설정           | `/api/data/setting-{name}`                                                       |
+| 알림           | `/api/v1/notifications`, `/api/v1/reminders`                                     |
 
 이 모드는 원본 서버 규격을 보존하며, 첨부 `RoutineSlim-Server-dev`와 직접 호환된다는 뜻이 아닙니다.
 
-## 2. server-dev — 첨부 Spring 서버의 부분 연결 어댑터
+## 2. server-dev — 첨부 Spring 서버의 부분 연결 어댑터 (기본값)
 
 `.env.server-dev.example`을 `.env.local`로 복사합니다. 기본 백엔드 주소는 `http://localhost:8080`입니다.
 
-| 웹 요청 | 첨부 서버와의 연결 |
-| --- | --- |
-| `POST /api/login` | `POST /auth/login`의 `memberName/memberPassword`로 변환, UUID 응답 검증 |
-| `GET /api/me` | 이미 로그인한 회원 UUID의 브라우저 세션 복원. 서버의 현재 인증/회원 상태 검증은 아님 |
-| `POST /api/logout` | 브라우저의 UUID 삭제. 서버 로그아웃 API는 없음 |
-| `GET /api/v1/subscriptions` | `X-Member-Id` 헤더 추가, ACTIVE 구독을 원본 화면 필드로 변환 |
-| `GET /api/v1/subscriptions/{id}` | 단일 구독 응답 필드 변환 |
-| `POST /api/v1/subscriptions` | 실제 카테고리 ID·BillingCycle·startDate 규격으로 변환 |
-| `PUT /api/v1/subscriptions/{id}` | 기존 preset/card/알림/memo 필드를 읽고 보존하여 전체 수정 |
-| `DELETE /api/v1/subscriptions/{id}` | 실제 DELETE API 호출 |
+| 웹 요청                             | 첨부 서버와의 연결                                                                   |
+| ----------------------------------- | ------------------------------------------------------------------------------------ |
+| `POST /api/login`                   | `POST /auth/login`의 `memberName/memberPassword`로 변환, UUID 응답 검증              |
+| `GET /api/me`                       | 이미 로그인한 회원 UUID의 브라우저 세션 복원. 서버의 현재 인증/회원 상태 검증은 아님 |
+| `POST /api/logout`                  | 브라우저의 UUID 삭제. 서버 로그아웃 API는 없음                                       |
+| `GET /api/v1/subscriptions`         | `X-Member-Id` 헤더 추가, ACTIVE 구독을 원본 화면 필드로 변환                         |
+| `GET /api/v1/subscriptions/{id}`    | 단일 구독 응답 필드 변환                                                             |
+| `POST /api/v1/subscriptions`        | 실제 카테고리 ID·BillingCycle·startDate 규격으로 변환                                |
+| `PUT /api/v1/subscriptions/{id}`    | 기존 preset/card/알림/memo 필드를 읽고 보존하여 전체 수정                            |
+| `DELETE /api/v1/subscriptions/{id}` | 실제 DELETE API 호출                                                                 |
 
 어댑터 테스트는 **모의 HTTP 응답을 사용하는 프론트 테스트**입니다. 실제 Spring 서버·DB를 실행해 통합 검증한 결과가 아닙니다.
 

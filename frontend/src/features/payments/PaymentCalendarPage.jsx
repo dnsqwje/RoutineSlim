@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { request, money, today } from "../../api/apiClient";
+import { apiRequest, formatWon, getTodayDate } from "../../api/apiClient";
 export default function PaymentCalendarPage() {
-  const [month, setMonth] = useState(today().slice(0, 7)),
+  const [month, setMonth] = useState(getTodayDate().slice(0, 7)),
     [events, setEvents] = useState([]),
     [selected, setSelected] = useState(null),
     [error, setError] = useState(""),
@@ -12,7 +12,7 @@ export default function PaymentCalendarPage() {
     setEvents([]);
     setSelected(null);
     const [year, m] = month.split("-");
-    request(`/api/v1/calendar/events?year=${year}&month=${Number(m)}`)
+    apiRequest(`/api/v1/calendar/events?year=${year}&month=${Number(m)}`)
       .then((value) => {
         if (active) {
           setEvents(value);
@@ -35,9 +35,7 @@ export default function PaymentCalendarPage() {
     shown = selected ? events.filter((x) => x.date === selected) : events;
   function shift(amount) {
     const date = new Date(year, m - 1 + amount, 1);
-    setMonth(
-      `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`,
-    );
+    setMonth(`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`);
   }
   return (
     <section>
@@ -48,7 +46,7 @@ export default function PaymentCalendarPage() {
       <div className="stats budget-stats">
         <article className="stat">
           <span>선택 월 예상 결제</span>
-          <strong>{money(events.reduce((sum, x) => sum + x.amount, 0))}</strong>
+          <strong>{formatWon(events.reduce((sum, x) => sum + x.amount, 0))}</strong>
         </article>
         <article className="stat">
           <span>결제 일정</span>
@@ -65,11 +63,7 @@ export default function PaymentCalendarPage() {
             {year}년 {m}월
           </h2>
           <div className="table-actions">
-            <button
-              className="secondary small"
-              aria-label="이전 달"
-              onClick={() => shift(-1)}
-            >
+            <button className="secondary small" aria-label="이전 달" onClick={() => shift(-1)}>
               ‹
             </button>
             <input
@@ -80,11 +74,7 @@ export default function PaymentCalendarPage() {
                 if (e.target.value) setMonth(e.target.value);
               }}
             />
-            <button
-              className="secondary small"
-              aria-label="다음 달"
-              onClick={() => shift(1)}
-            >
+            <button className="secondary small" aria-label="다음 달" onClick={() => shift(1)}>
               ›
             </button>
           </div>
@@ -112,7 +102,7 @@ export default function PaymentCalendarPage() {
                 key={date}
                 className={
                   "calendar-day " +
-                  (date === today() ? "today " : "") +
+                  (date === getTodayDate() ? "today " : "") +
                   (date === selected ? "selected" : "")
                 }
                 aria-label={`${m}월 ${day}일 결제 ${items.length}건`}
@@ -149,13 +139,11 @@ export default function PaymentCalendarPage() {
                   {x.date} · {x.category}
                 </p>
               </div>
-              <strong>{money(x.amount)}</strong>
+              <strong>{formatWon(x.amount)}</strong>
             </div>
           ))
         ) : (
-          <p className="muted">
-            선택한 {selected ? "날짜" : "달"}의 결제 예정 항목이 없습니다.
-          </p>
+          <p className="muted">선택한 {selected ? "날짜" : "달"}의 결제 예정 항목이 없습니다.</p>
         )}
       </section>
     </section>

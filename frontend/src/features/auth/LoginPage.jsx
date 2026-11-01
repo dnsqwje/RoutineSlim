@@ -1,7 +1,7 @@
 import BrandLogo from "../../components/common/BrandLogo";
 import "../../styles/login.css";
 import React, { useState } from "react";
-import { request } from "../../api/apiClient";
+import { apiRequest } from "../../api/apiClient";
 export default function LoginPage({ onLogin, onAbout, onSupport }) {
   const [rememberMe, setRememberMe] = useState(true);
   const [id, setId] = useState(""),
@@ -14,7 +14,7 @@ export default function LoginPage({ onLogin, onAbout, onSupport }) {
     setBusy(true);
     setError("");
     try {
-      const account = await request("/api/login", {
+      const account = await apiRequest("/api/login", {
         method: "POST",
         body: { id, password, rememberMe },
       });
@@ -96,9 +96,7 @@ export default function LoginPage({ onLogin, onAbout, onSupport }) {
         </section>
         <section className="login-form-panel">
           <h2>로그인</h2>
-          <p className="login-subtitle">
-            RoutineSlim에 로그인하고 나만의 구독을 관리하세요.
-          </p>
+          <p className="login-subtitle">RoutineSlim에 로그인하고 나만의 구독을 관리하세요.</p>
           <form onSubmit={submit}>
             <label htmlFor="signin-id">
               이메일 또는 아이디 <em>*</em>

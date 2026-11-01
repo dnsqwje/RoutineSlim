@@ -1,13 +1,7 @@
 import { useApiResource } from "../../hooks/useApiResource";
 import React, { useState } from "react";
-import { request } from "../../api/apiClient";
-import {
-  Heading,
-  Status,
-  Empty,
-  Tabs,
-  dateText,
-} from "../../components/common/SharedUI";
+import { apiRequest } from "../../api/apiClient";
+import { Heading, Status, Empty, Tabs, dateText } from "../../components/common/SharedUI";
 export default function NotificationCenterPage({ navigate }) {
   const r = useApiResource("/api/v1/notifications"),
     [tab, setTab] = useState("all");
@@ -15,21 +9,21 @@ export default function NotificationCenterPage({ navigate }) {
     unread = items.filter((x) => !x.read).length;
   async function read(x) {
     await r.run(async () => {
-      await request(`/api/v1/notifications/${x.id}/read`, { method: "POST" });
+      await apiRequest(`/api/v1/notifications/${x.id}/read`, { method: "POST" });
       await r.reload();
       window.dispatchEvent(new Event("routineslim:notifications"));
     });
   }
   async function all() {
     await r.run(async () => {
-      await request("/api/v1/notifications/read-all", { method: "POST" });
+      await apiRequest("/api/v1/notifications/read-all", { method: "POST" });
       await r.reload();
       window.dispatchEvent(new Event("routineslim:notifications"));
     });
   }
   async function remove(x) {
     await r.run(async () => {
-      await request(`/api/v1/notifications/${x.id}`, { method: "DELETE" });
+      await apiRequest(`/api/v1/notifications/${x.id}`, { method: "DELETE" });
       await r.reload();
       window.dispatchEvent(new Event("routineslim:notifications"));
     });
@@ -40,11 +34,7 @@ export default function NotificationCenterPage({ navigate }) {
         title="알림센터"
         description="결제 예정·무료체험 종료·댓글·문의 답변을 한곳에서 확인하세요."
       >
-        <button
-          className="secondary"
-          disabled={r.busy || !unread}
-          onClick={all}
-        >
+        <button className="secondary" disabled={r.busy || !unread} onClick={all}>
           모두 읽음
         </button>
       </Heading>
@@ -62,9 +52,7 @@ export default function NotificationCenterPage({ navigate }) {
           .filter((x) => tab === "all" || !x.read)
           .map((x) => (
             <article
-              className={
-                "feature-row feature-notification " + (!x.read ? "unread" : "")
-              }
+              className={"feature-row feature-notification " + (!x.read ? "unread" : "")}
               key={x.id}
             >
               <span className="feature-notification-dot" />
@@ -85,29 +73,22 @@ export default function NotificationCenterPage({ navigate }) {
                   확인
                 </button>
                 {!x.read && (
-                  <button
-                    className="secondary small"
-                    disabled={r.busy}
-                    onClick={() => read(x)}
-                  >
+                  <button className="secondary small" disabled={r.busy} onClick={() => read(x)}>
                     읽음
                   </button>
                 )}
-                <button
-                  className="danger small"
-                  disabled={r.busy}
-                  onClick={() => remove(x)}
-                >
+                <button className="danger small" disabled={r.busy} onClick={() => remove(x)}>
                   삭제
                 </button>
               </div>
             </article>
           ))}
-        {!items.filter((x) => tab === "all" || !x.read).length &&
-          !r.loading && <Empty>새 알림이 없습니다.</Empty>}
+        {!items.filter((x) => tab === "all" || !x.read).length && !r.loading && (
+          <Empty>새 알림이 없습니다.</Empty>
+        )}
         <p className="muted">
-          앱을 열어 확인할 때 결제·무료체험·예산 알림을 갱신합니다. 문자나 원격
-          푸시는 발송하지 않습니다.
+          앱을 열어 확인할 때 결제·무료체험·예산 알림을 갱신합니다. 문자나 원격 푸시는 발송하지
+          않습니다.
         </p>
       </section>
     </section>

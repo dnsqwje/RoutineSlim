@@ -1,6 +1,6 @@
 import { useApiResource } from "../../hooks/useApiResource";
 import React, { useState } from "react";
-import { request, money, today } from "../../api/apiClient";
+import { apiRequest, formatWon, getTodayDate } from "../../api/apiClient";
 import {
   Heading,
   Status,
@@ -18,8 +18,7 @@ export default function FreeTrialPage() {
   const items = r.data || [];
   const days = (x) =>
     Math.round(
-      (new Date(x.endDate + "T00:00:00") - new Date(today() + "T00:00:00")) /
-        86400000,
+      (new Date(x.endDate + "T00:00:00") - new Date(getTodayDate() + "T00:00:00")) / 86400000,
     );
   const active = items.filter((x) => x.status === "ACTIVE"),
     soon = active.filter((x) => days(x) >= 0 && days(x) <= 7);
@@ -30,7 +29,7 @@ export default function FreeTrialPage() {
       item || {
         name: "",
         category: "영상",
-        endDate: today(),
+        endDate: getTodayDate(),
         amount: "",
         notifyDays: 3,
         status: "ACTIVE",
@@ -40,7 +39,7 @@ export default function FreeTrialPage() {
   async function save(e) {
     e.preventDefault();
     await r.run(async () => {
-      await request("/api/v1/trials" + (form.id ? "/" + form.id : ""), {
+      await apiRequest("/api/v1/trials" + (form.id ? "/" + form.id : ""), {
         method: form.id ? "PUT" : "POST",
         body: {
           name: form.name,
@@ -57,7 +56,7 @@ export default function FreeTrialPage() {
   }
   async function status(item) {
     await r.run(async () => {
-      await request("/api/v1/trials/" + item.id, {
+      await apiRequest("/api/v1/trials/" + item.id, {
         method: "PUT",
         body: {
           ...item,
@@ -70,7 +69,7 @@ export default function FreeTrialPage() {
   async function remove(item) {
     if (!confirm("이 무료체험 기록을 삭제할까요?")) return;
     await r.run(async () => {
-      await request("/api/v1/trials/" + item.id, { method: "DELETE" });
+      await apiRequest("/api/v1/trials/" + item.id, { method: "DELETE" });
       await r.reload();
     });
   }
@@ -91,14 +90,14 @@ export default function FreeTrialPage() {
           ["7일 이내 종료", soon.length + "개"],
           [
             "예상 유료 전환 금액",
-            money(soon.reduce((n, x) => n + x.amount, 0)),
+            formatWon(soon.reduce((n, x) => n + x.amount, 0)),
             "7일 이내 종료 항목 기준",
           ],
         ]}
       />
       <p className="feature-note">
-        실제 해지는 해당 서비스에서 진행한 후 ‘해지 확인’을 표시해주세요. 종료
-        알림은 알림센터에서 확인합니다.
+        실제 해지는 해당 서비스에서 진행한 후 ‘해지 확인’을 표시해주세요. 종료 알림은 알림센터에서
+        확인합니다.
       </p>
       <div className="feature-split">
         <div className="panel">
@@ -115,19 +114,15 @@ export default function FreeTrialPage() {
           {visible.length ? (
             visible.map((x) => (
               <div className="feature-row" key={x.id}>
-                <span className="feature-service-icon">
-                  {x.name.slice(0, 1)}
-                </span>
+                <span className="feature-service-icon">{x.name.slice(0, 1)}</span>
                 <div className="feature-grow">
                   <b>{x.name}</b>
                   <p>
                     {x.category} · {x.endDate} 종료 · {x.notifyDays}일 전 알림
                   </p>
                 </div>
-                <strong>{money(x.amount)}</strong>
-                <span
-                  className={"feature-pill " + (days(x) <= 3 ? "warning" : "")}
-                >
+                <strong>{formatWon(x.amount)}</strong>
+                <span className={"feature-pill " + (days(x) <= 3 ? "warning" : "")}>
                   {x.status === "CANCELLED"
                     ? "해지 확인"
                     : days(x) < 0
@@ -137,25 +132,13 @@ export default function FreeTrialPage() {
                         : "D−" + days(x)}
                 </span>
                 <div className="feature-actions">
-                  <button
-                    className="secondary small"
-                    disabled={r.busy}
-                    onClick={() => open(x)}
-                  >
+                  <button className="secondary small" disabled={r.busy} onClick={() => open(x)}>
                     수정
                   </button>
-                  <button
-                    className="secondary small"
-                    disabled={r.busy}
-                    onClick={() => status(x)}
-                  >
+                  <button className="secondary small" disabled={r.busy} onClick={() => status(x)}>
                     {x.status === "ACTIVE" ? "해지 확인" : "진행 중으로"}
                   </button>
-                  <button
-                    className="danger small"
-                    disabled={r.busy}
-                    onClick={() => remove(x)}
-                  >
+                  <button className="danger small" disabled={r.busy} onClick={() => remove(x)}>
                     삭제
                   </button>
                 </div>
@@ -172,7 +155,7 @@ export default function FreeTrialPage() {
               <div className="feature-timeline" key={x.id}>
                 <b>{x.endDate}</b>
                 <p>
-                  {x.name} · {money(x.amount)}
+                  {x.name} · {formatWon(x.amount)}
                 </p>
               </div>
             ))
@@ -229,9 +212,7 @@ export default function FreeTrialPage() {
                 min="0"
                 max="30"
                 value={form.notifyDays}
-                onChange={(e) =>
-                  setForm({ ...form, notifyDays: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, notifyDays: e.target.value })}
               />
             </Field>
             <FormActions busy={r.busy} onCancel={() => setForm(null)} />

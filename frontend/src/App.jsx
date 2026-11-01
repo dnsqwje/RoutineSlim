@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { request } from "./api/apiClient";
+import { apiRequest } from "./api/apiClient";
 import AppLayout from "./components/layout/AppLayout";
 import BrandLogo from "./components/common/BrandLogo";
 import LoginPage from "./features/auth/LoginPage";
@@ -72,7 +72,7 @@ export default function App() {
   }
   useEffect(() => {
     let active = true;
-    request("/api/me")
+    apiRequest("/api/me")
       .then((v) => {
         if (active) setUser(v.id);
       })
@@ -102,7 +102,7 @@ export default function App() {
     setAdmin(false);
     if (!user) return;
     setCheckingAdmin(true);
-    request("/api/v1/community/moderation")
+    apiRequest("/api/v1/community/moderation")
       .then((v) => {
         if (active) setAdmin(v.admin);
       })
@@ -121,7 +121,7 @@ export default function App() {
     }
     let active = true;
     const update = () =>
-      request("/api/v1/notifications")
+      apiRequest("/api/v1/notifications")
         .then((items) => {
           if (active) setUnread(items.filter((x) => !x.read).length);
         })
@@ -137,7 +137,7 @@ export default function App() {
   }, [user, route.key]);
   async function logout() {
     try {
-      await request("/api/logout", { method: "POST" });
+      await apiRequest("/api/logout", { method: "POST" });
       setUser(null);
       setAdmin(false);
       navigate("login");
@@ -191,11 +191,7 @@ export default function App() {
       content = <DashboardPage {...props} />;
       break;
     case "subscriptions":
-      content = (
-        <SubscriptionListPage
-          onDetails={(id) => navigate("subscription-detail", id)}
-        />
-      );
+      content = <SubscriptionListPage onDetails={(id) => navigate("subscription-detail", id)} />;
       break;
     case "payments":
       content = <PaymentHistoryPage />;

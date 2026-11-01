@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { request } from "../api/apiClient";
+import { apiRequest } from "../api/apiClient";
 let shared = null;
 function load() {
   if (!shared)
-    shared = request("/api/v1/catalog")
+    shared = apiRequest("/api/v1/catalog")
       .then((rows) =>
         Array.isArray(rows)
           ? rows.filter(

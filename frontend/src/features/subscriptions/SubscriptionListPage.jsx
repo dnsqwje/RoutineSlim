@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { request, money } from "../../api/apiClient";
+import { apiRequest, formatWon } from "../../api/apiClient";
 import { exportCsv } from "../../utils/csvExport";
 import ServiceBadge from "../../components/common/ServiceBadge";
 import SubscriptionEditor from "./components/SubscriptionEditor";
@@ -15,7 +15,7 @@ export default function SubscriptionListPage({ onDetails }) {
     [busy, setBusy] = useState(false);
   useEffect(() => {
     let active = true;
-    request("/api/v1/subscriptions")
+    apiRequest("/api/v1/subscriptions")
       .then((rows) => {
         if (active) setItems(rows);
       })
@@ -27,12 +27,11 @@ export default function SubscriptionListPage({ onDetails }) {
     };
   }, []);
   async function remove(id) {
-    if (busy || !confirm("이 구독을 삭제할까요? 실제 결제 내역은 보존됩니다."))
-      return;
+    if (busy || !confirm("이 구독을 삭제할까요? 실제 결제 내역은 보존됩니다.")) return;
     setBusy(true);
     setError("");
     try {
-      await request("/api/v1/subscriptions/" + id, { method: "DELETE" });
+      await apiRequest("/api/v1/subscriptions/" + id, { method: "DELETE" });
       setItems((rows) => rows.filter((x) => x.id !== id));
       window.dispatchEvent(new Event("routineslim:subscriptions"));
     } catch (e) {
@@ -146,17 +145,11 @@ export default function SubscriptionListPage({ onDetails }) {
                     </span>
                   </td>
                   <td>{x.category}</td>
+                  <td>{x.cycle === "yearly" ? "매년" : x.cycle === "weekly" ? "매주" : "매월"}</td>
                   <td>
-                    {x.cycle === "yearly"
-                      ? "매년"
-                      : x.cycle === "weekly"
-                        ? "매주"
-                        : "매월"}
-                  </td>
-                  <td>
-                    <b>{money(x.amount)}</b>
+                    <b>{formatWon(x.amount)}</b>
                     <small className="amount-caption">
-                      월 환산 {money(Math.round(monthlyAmount(x)))}
+                      월 환산 {formatWon(Math.round(monthlyAmount(x)))}
                     </small>
                   </td>
                   <td>
@@ -172,10 +165,7 @@ export default function SubscriptionListPage({ onDetails }) {
                   <td>
                     <div className="table-actions">
                       {onDetails && (
-                        <button
-                          className="secondary small"
-                          onClick={() => onDetails(x.id)}
-                        >
+                        <button className="secondary small" onClick={() => onDetails(x.id)}>
                           상세
                         </button>
                       )}
@@ -188,11 +178,7 @@ export default function SubscriptionListPage({ onDetails }) {
                       >
                         수정
                       </button>
-                      <button
-                        className="danger small"
-                        disabled={busy}
-                        onClick={() => remove(x.id)}
-                      >
+                      <button className="danger small" disabled={busy} onClick={() => remove(x.id)}>
                         삭제
                       </button>
                     </div>
@@ -205,9 +191,7 @@ export default function SubscriptionListPage({ onDetails }) {
         {!visible.length && (
           <div className="designed-empty">
             <p>
-              {items.length
-                ? "검색 조건에 맞는 고정비가 없습니다."
-                : "등록된 구독이 없습니다."}
+              {items.length ? "검색 조건에 맞는 고정비가 없습니다." : "등록된 구독이 없습니다."}
             </p>
           </div>
         )}
@@ -218,9 +202,7 @@ export default function SubscriptionListPage({ onDetails }) {
           onClose={() => setOpen(false)}
           onSaved={(saved) => {
             setItems((rows) =>
-              editing
-                ? rows.map((x) => (x.id === saved.id ? saved : x))
-                : [saved, ...rows],
+              editing ? rows.map((x) => (x.id === saved.id ? saved : x)) : [saved, ...rows],
             );
             setOpen(false);
             setEditing(null);

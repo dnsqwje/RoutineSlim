@@ -1,6 +1,6 @@
 import { useApiResource } from "../../hooks/useApiResource";
 import React, { useState } from "react";
-import { request } from "../../api/apiClient";
+import { apiRequest } from "../../api/apiClient";
 import {
   Heading,
   Status,
@@ -15,9 +15,7 @@ export default function SupportCenterPage({ user, navigate }) {
   const [tab, setTab] = useState("faqs"),
     [search, setSearch] = useState(""),
     [form, setForm] = useState(null);
-  const r = useApiResource(
-    tab === "inquiries" && !user ? null : "/api/v1/support/" + tab,
-  );
+  const r = useApiResource(tab === "inquiries" && !user ? null : "/api/v1/support/" + tab);
   const rows = (r.data || []).filter((x) =>
     (x.title + " " + (x.content || "") + " " + (x.answer || ""))
       .toLowerCase()
@@ -26,7 +24,7 @@ export default function SupportCenterPage({ user, navigate }) {
   async function send(e) {
     e.preventDefault();
     await r.run(async () => {
-      await request("/api/v1/support/inquiries", {
+      await apiRequest("/api/v1/support/inquiries", {
         method: "POST",
         body: form,
       });
@@ -38,7 +36,7 @@ export default function SupportCenterPage({ user, navigate }) {
   async function remove(x) {
     if (!confirm("문의와 답변을 삭제할까요?")) return;
     await r.run(async () => {
-      await request("/api/v1/support/inquiries/" + x.id, { method: "DELETE" });
+      await apiRequest("/api/v1/support/inquiries/" + x.id, { method: "DELETE" });
       await r.reload();
     });
   }
@@ -52,10 +50,7 @@ export default function SupportCenterPage({ user, navigate }) {
   }
   return (
     <section className="feature-page">
-      <Heading
-        title="고객센터"
-        description="궁금한 점을 확인하고 도움이 필요하면 문의해주세요."
-      >
+      <Heading title="고객센터" description="궁금한 점을 확인하고 도움이 필요하면 문의해주세요.">
         <button className="primary" onClick={open}>
           {user ? "문의하기" : "로그인 후 문의하기"}
         </button>
@@ -105,11 +100,7 @@ export default function SupportCenterPage({ user, navigate }) {
                   </div>
                 )}
                 {tab === "inquiries" && (
-                  <button
-                    className="danger small"
-                    disabled={r.busy}
-                    onClick={() => remove(x)}
-                  >
+                  <button className="danger small" disabled={r.busy} onClick={() => remove(x)}>
                     문의 삭제
                   </button>
                 )}
@@ -129,22 +120,16 @@ export default function SupportCenterPage({ user, navigate }) {
         )}
       </section>
       {form && (
-        <Modal
-          title="문의하기"
-          error={r.error}
-          onClose={() => !r.busy && setForm(null)}
-        >
+        <Modal title="문의하기" error={r.error} onClose={() => !r.busy && setForm(null)}>
           <form className="feature-form" onSubmit={send}>
             <Field label="문의 유형">
               <select
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
               >
-                {["서비스 이용", "회원·인증", "데이터 관리", "기타"].map(
-                  (x) => (
-                    <option key={x}>{x}</option>
-                  ),
-                )}
+                {["서비스 이용", "회원·인증", "데이터 관리", "기타"].map((x) => (
+                  <option key={x}>{x}</option>
+                ))}
               </select>
             </Field>
             <Field label="제목">
@@ -164,11 +149,7 @@ export default function SupportCenterPage({ user, navigate }) {
                 onChange={(e) => setForm({ ...form, content: e.target.value })}
               />
             </Field>
-            <FormActions
-              busy={r.busy}
-              onCancel={() => setForm(null)}
-              label="문의 등록"
-            />
+            <FormActions busy={r.busy} onCancel={() => setForm(null)} label="문의 등록" />
           </form>
         </Modal>
       )}

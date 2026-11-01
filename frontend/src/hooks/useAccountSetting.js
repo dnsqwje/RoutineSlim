@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { request } from "../api/apiClient";
+import { apiRequest } from "../api/apiClient";
 const readCache = (key) => {
   try {
     return localStorage.getItem(key);
@@ -18,9 +18,7 @@ function valid(name, value, fallback) {
   if (name === "reminder-days")
     return [0, 1, 3, 7].includes(Number(value)) ? Number(value) : fallback;
   if (name === "budget")
-    return value === "" || /^[0-9]{1,15}$/.test(String(value))
-      ? String(value)
-      : fallback;
+    return value === "" || /^[0-9]{1,15}$/.test(String(value)) ? String(value) : fallback;
   return value;
 }
 export function useAccountSetting(user, name, fallback) {
@@ -33,14 +31,14 @@ export function useAccountSetting(user, name, fallback) {
     setReady(false);
     setError("");
     setValue(fallback);
-    request("/api/data/setting-" + name)
+    apiRequest("/api/data/setting-" + name)
       .then(async (result) => {
         let current = JSON.parse(result.json);
         if (current === null) {
           const cached = readCache(key);
           current = valid(name, cached ?? fallback, fallback);
           if (cached !== null && active)
-            await request("/api/data/setting-" + name, {
+            await apiRequest("/api/data/setting-" + name, {
               method: "PUT",
               body: { json: JSON.stringify(current) },
             });
@@ -60,7 +58,7 @@ export function useAccountSetting(user, name, fallback) {
     };
   }, [user, name]);
   async function save(next = value) {
-    await request("/api/data/setting-" + name, {
+    await apiRequest("/api/data/setting-" + name, {
       method: "PUT",
       body: { json: JSON.stringify(next) },
     });

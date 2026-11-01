@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-  cleanup,
-  within,
-} from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, cleanup, within } from "@testing-library/react";
 import FreeTrialPage from "../features/subscriptions/FreeTrialPage";
 import MonthlyReportPage from "../features/reports/MonthlyReportPage";
 import SubscriptionComparisonPage from "../features/subscriptions/SubscriptionComparisonPage";
@@ -18,20 +11,20 @@ import SubscriptionDetailPage from "../features/subscriptions/SubscriptionDetail
 import App from "../App";
 import AdminPage from "../features/admin/AdminPage";
 import BrandLogo from "../components/common/BrandLogo";
-import { request } from "../api/apiClient";
+import { apiRequest } from "../api/apiClient";
 vi.mock("../api/apiClient", () => ({
-  request: vi.fn(),
-  money: (n) => Number(n || 0).toLocaleString("ko-KR") + "원",
-  today: () => "2026-10-24",
+  apiRequest: vi.fn(),
+  formatWon: (n) => Number(n || 0).toLocaleString("ko-KR") + "원",
+  getTodayDate: () => "2026-10-24",
 }));
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
-  request.mockReset();
+  apiRequest.mockReset();
 });
 it("saves a free trial through the API and displays the saved record", async () => {
   let items = [];
-  request.mockImplementation(async (path, options) => {
+  apiRequest.mockImplementation(async (path, options) => {
     if (options?.method === "POST") {
       items = [{ id: "trial-1", ...options.body }];
       return items[0];
@@ -49,7 +42,7 @@ it("saves a free trial through the API and displays the saved record", async () 
   });
   fireEvent.click(screen.getByRole("button", { name: "저장", exact: true }));
   await screen.findByText("My trial");
-  expect(request).toHaveBeenCalledWith("/api/v1/trials", {
+  expect(apiRequest).toHaveBeenCalledWith("/api/v1/trials", {
     method: "POST",
     body: {
       name: "My trial",
@@ -62,7 +55,7 @@ it("saves a free trial through the API and displays the saved record", async () 
   });
 });
 it("monthly settlement uses server totals and does not invent missing comparisons", async () => {
-  request.mockResolvedValue({
+  apiRequest.mockResolvedValue({
     month: "2026-10",
     total: 0,
     previousTotal: 0,
@@ -88,19 +81,15 @@ it("persists selected real catalog plan IDs", async () => {
     sourceUrl: "https://example.com",
     updatedAt: "2026-10-24T00:00:00Z",
   };
-  request.mockImplementation(async (path, options) =>
-    options?.method === "PUT"
-      ? null
-      : path.endsWith("/selection")
-        ? []
-        : [plan],
+  apiRequest.mockImplementation(async (path, options) =>
+    options?.method === "PUT" ? null : path.endsWith("/selection") ? [] : [plan],
   );
   render(<SubscriptionComparisonPage />);
   await screen.findByText("Basic");
   fireEvent.click(screen.getByRole("button", { name: "비교에 추가" }));
   fireEvent.click(screen.getByRole("button", { name: "선택 저장" }));
   await screen.findByText("비교 선택을 계정에 저장했습니다.");
-  expect(request).toHaveBeenCalledWith("/api/v1/comparison/selection", {
+  expect(apiRequest).toHaveBeenCalledWith("/api/v1/comparison/selection", {
     method: "PUT",
     body: { ids: ["plan-1"] },
   });
@@ -114,7 +103,7 @@ it("goal checklist changes are saved on the server", async () => {
     tasks: ["Check subscription"],
     completed: [false],
   };
-  request.mockImplementation(async (path, options) => {
+  apiRequest.mockImplementation(async (path, options) => {
     if (options?.method === "PUT") {
       goal = { ...goal, ...options.body };
       return goal;
@@ -125,7 +114,7 @@ it("goal checklist changes are saved on the server", async () => {
   await screen.findByLabelText("Check subscription");
   fireEvent.click(screen.getByLabelText("Check subscription"));
   await waitFor(() =>
-    expect(request).toHaveBeenCalledWith("/api/v1/goals/goal-1", {
+    expect(apiRequest).toHaveBeenCalledWith("/api/v1/goals/goal-1", {
       method: "PUT",
       body: { ...goal, completed: [true] },
     }),
@@ -133,11 +122,9 @@ it("goal checklist changes are saved on the server", async () => {
 });
 it("customer inquiries are submitted and appear under my inquiries", async () => {
   let items = [];
-  request.mockImplementation(async (path, options) => {
+  apiRequest.mockImplementation(async (path, options) => {
     if (options?.method === "POST") {
-      items = [
-        { id: "q1", ...options.body, status: "OPEN", createdAt: "2026-10-24" },
-      ];
+      items = [{ id: "q1", ...options.body, status: "OPEN", createdAt: "2026-10-24" }];
       return items[0];
     }
     return path.endsWith("/inquiries") ? items : [];
@@ -157,10 +144,8 @@ it("customer inquiries are submitted and appear under my inquiries", async () =>
 });
 it("my activity opens the correct community post", async () => {
   const navigate = vi.fn();
-  request.mockResolvedValue({
-    posts: [
-      { id: 42, title: "My post", category: "자유", createdAt: "2026-10-24" },
-    ],
+  apiRequest.mockResolvedValue({
+    posts: [{ id: 42, title: "My post", category: "자유", createdAt: "2026-10-24" }],
     comments: [],
     likes: [],
   });
@@ -180,23 +165,22 @@ it("notifications support read all through the real endpoint", async () => {
       page: "trials",
     },
   ];
-  request.mockImplementation(async (path, options) => {
-    if (options?.method === "POST")
-      rows = rows.map((x) => ({ ...x, read: true }));
+  apiRequest.mockImplementation(async (path, options) => {
+    if (options?.method === "POST") rows = rows.map((x) => ({ ...x, read: true }));
     return rows;
   });
   render(<NotificationCenterPage navigate={() => {}} />);
   await screen.findByText("Upcoming");
   fireEvent.click(screen.getByRole("button", { name: "모두 읽음" }));
   await waitFor(() =>
-    expect(request).toHaveBeenCalledWith("/api/v1/notifications/read-all", {
+    expect(apiRequest).toHaveBeenCalledWith("/api/v1/notifications/read-all", {
       method: "POST",
     }),
   );
   await screen.findByRole("button", { name: "읽지 않음 0" });
 });
 it("subscription management notes are saved", async () => {
-  request.mockImplementation(async (path, options) =>
+  apiRequest.mockImplementation(async (path, options) =>
     options?.method === "PUT"
       ? null
       : {
@@ -222,22 +206,22 @@ it("subscription management notes are saved", async () => {
   });
   fireEvent.click(screen.getByRole("button", { name: "메모 저장" }));
   await screen.findByText("메모를 저장했습니다.");
-  expect(request).toHaveBeenCalledWith("/api/v1/subscriptions/1/note", {
+  expect(apiRequest).toHaveBeenCalledWith("/api/v1/subscriptions/1/note", {
     method: "PUT",
     body: { note: "Review later" },
   });
 });
 it("old account recovery links return guests to ordinary login", async () => {
   window.history.replaceState({}, "", "/#recovery");
-  request.mockRejectedValue(new Error("Unauthorized"));
+  apiRequest.mockRejectedValue(new Error("Unauthorized"));
   render(<App />);
   await screen.findByRole("heading", { name: "로그인", exact: true });
   expect(screen.queryByLabelText("가입 시 인증한 이메일")).toBeNull();
-  expect(request.mock.calls.some(([path]) => path.startsWith("/api/recovery/"))).toBe(false);
+  expect(apiRequest.mock.calls.some(([path]) => path.startsWith("/api/recovery/"))).toBe(false);
   window.history.replaceState({}, "", "/");
 });
 it("admin can create published content through the admin API", async () => {
-  request.mockImplementation(async (path) =>
+  apiRequest.mockImplementation(async (path) =>
     path.endsWith("/overview")
       ? { members: 1, posts: 0, reports: 0, openInquiries: 0 }
       : path.includes("/members")
@@ -246,9 +230,7 @@ it("admin can create published content through the admin API", async () => {
   );
   render(<AdminPage user="admin" />);
   await screen.findByText("회원 목록");
-  fireEvent.click(
-    screen.getByRole("button", { name: "공지사항", exact: true }),
-  );
+  fireEvent.click(screen.getByRole("button", { name: "공지사항", exact: true }));
   await screen.findByText("공지사항 관리");
   fireEvent.click(screen.getByRole("button", { name: "＋ 등록" }));
   fireEvent.change(screen.getByLabelText("제목"), {
@@ -259,7 +241,7 @@ it("admin can create published content through the admin API", async () => {
   });
   fireEvent.click(screen.getByRole("button", { name: "저장", exact: true }));
   await waitFor(() =>
-    expect(request).toHaveBeenCalledWith("/api/v1/admin/content/notice", {
+    expect(apiRequest).toHaveBeenCalledWith("/api/v1/admin/content/notice", {
       method: "POST",
       body: {
         title: "Notice",
@@ -288,7 +270,7 @@ it("cannot overwrite a saved comparison before its selection has loaded", async 
     features: [],
     updatedAt: "2026-10-24",
   };
-  request.mockImplementation((path) =>
+  apiRequest.mockImplementation((path) =>
     path.endsWith("/selection")
       ? new Promise((resolve) => {
           finish = resolve;
@@ -298,14 +280,10 @@ it("cannot overwrite a saved comparison before its selection has loaded", async 
   render(<SubscriptionComparisonPage />);
   await screen.findByText("Basic");
   expect(screen.getByRole("button", { name: "선택 저장" }).disabled).toBe(true);
-  expect(screen.getByRole("button", { name: "비교에 추가" }).disabled).toBe(
-    true,
-  );
+  expect(screen.getByRole("button", { name: "비교에 추가" }).disabled).toBe(true);
   finish([plan]);
   await waitFor(() =>
-    expect(screen.getByRole("button", { name: "선택 저장" }).disabled).toBe(
-      false,
-    ),
+    expect(screen.getByRole("button", { name: "선택 저장" }).disabled).toBe(false),
   );
   expect(screen.getByRole("button", { name: "선택 해제" })).toBeTruthy();
 });

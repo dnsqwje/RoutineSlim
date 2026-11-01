@@ -1,6 +1,6 @@
 import { useApiResource } from "../../hooks/useApiResource";
 import React, { useEffect, useState } from "react";
-import { request, money } from "../../api/apiClient";
+import { apiRequest, formatWon } from "../../api/apiClient";
 import { Heading, Status, Empty, Tabs } from "../../components/common/SharedUI";
 export default function SubscriptionComparisonPage() {
   const r = useApiResource("/api/v1/comparison/plans"),
@@ -9,7 +9,7 @@ export default function SubscriptionComparisonPage() {
     [saved, setSaved] = useState(false),
     [selectionReady, setSelectionReady] = useState(false);
   useEffect(() => {
-    request("/api/v1/comparison/selection")
+    apiRequest("/api/v1/comparison/selection")
       .then((value) => {
         setSelected(value.map((x) => x.id));
         setSelectionReady(true);
@@ -18,9 +18,7 @@ export default function SubscriptionComparisonPage() {
   }, []);
   const plans = r.data || [],
     categories = ["전체", ...new Set(plans.map((x) => x.category))],
-    visible = plans.filter(
-      (x) => category === "전체" || x.category === category,
-    ),
+    visible = plans.filter((x) => category === "전체" || x.category === category),
     choices = plans.filter((x) => selected.includes(x.id));
   function toggle(id) {
     setSaved(false);
@@ -35,7 +33,7 @@ export default function SubscriptionComparisonPage() {
   async function save() {
     if (!selectionReady || r.loading || r.error) return;
     await r.run(async () => {
-      await request("/api/v1/comparison/selection", {
+      await apiRequest("/api/v1/comparison/selection", {
         method: "PUT",
         body: { ids: selected.filter((id) => plans.some((x) => x.id === id)) },
       });
@@ -62,26 +60,18 @@ export default function SubscriptionComparisonPage() {
           비교 선택을 계정에 저장했습니다.
         </p>
       )}
-      <Tabs
-        values={categories.map((x) => [x, x])}
-        value={category}
-        onChange={setCategory}
-      />
+      <Tabs values={categories.map((x) => [x, x])} value={category} onChange={setCategory} />
       {!plans.length && !r.loading ? (
         <div className="panel">
           <Empty>
-            등록된 요금제가 없습니다. 관리자가 요금과 출처를 등록하면 비교할 수
-            있습니다.
+            등록된 요금제가 없습니다. 관리자가 요금과 출처를 등록하면 비교할 수 있습니다.
           </Empty>
         </div>
       ) : (
         <div className="feature-plan-grid">
           {visible.map((x) => (
             <article
-              className={
-                "panel feature-plan " +
-                (selected.includes(x.id) ? "selected" : "")
-              }
+              className={"panel feature-plan " + (selected.includes(x.id) ? "selected" : "")}
               key={x.id}
             >
               <p className="muted">
@@ -89,8 +79,7 @@ export default function SubscriptionComparisonPage() {
               </p>
               <h2>{x.plan}</h2>
               <strong className="feature-price">
-                {money(x.amount)}{" "}
-                <small>/{x.cycle === "yearly" ? "년" : "월"}</small>
+                {formatWon(x.amount)} <small>/{x.cycle === "yearly" ? "년" : "월"}</small>
               </strong>
               <ul>
                 {(x.features || []).map((feature, i) => (
@@ -107,9 +96,7 @@ export default function SubscriptionComparisonPage() {
                 className={selected.includes(x.id) ? "primary" : "secondary"}
                 aria-pressed={selected.includes(x.id)}
                 disabled={
-                  !selectionReady ||
-                  r.busy ||
-                  (!selected.includes(x.id) && selected.length >= 3)
+                  !selectionReady || r.busy || (!selected.includes(x.id) && selected.length >= 3)
                 }
                 onClick={() => toggle(x.id)}
               >
@@ -141,34 +128,27 @@ export default function SubscriptionComparisonPage() {
                   <th>월 환산</th>
                   {choices.map((x) => (
                     <td key={x.id}>
-                      {money(
-                        Math.round(x.amount / (x.cycle === "yearly" ? 12 : 1)),
-                      )}
+                      {formatWon(Math.round(x.amount / (x.cycle === "yearly" ? 12 : 1)))}
                     </td>
                   ))}
                 </tr>
                 <tr>
                   <th>연 환산</th>
                   {choices.map((x) => (
-                    <td key={x.id}>
-                      {money(x.amount * (x.cycle === "yearly" ? 1 : 12))}
-                    </td>
+                    <td key={x.id}>{formatWon(x.amount * (x.cycle === "yearly" ? 1 : 12))}</td>
                   ))}
                 </tr>
                 <tr>
                   <th>제공 조건</th>
                   {choices.map((x) => (
-                    <td key={x.id}>
-                      {(x.features || []).join(" · ") || "정보 없음"}
-                    </td>
+                    <td key={x.id}>{(x.features || []).join(" · ") || "정보 없음"}</td>
                   ))}
                 </tr>
               </tbody>
             </table>
           </div>
           <p className="muted">
-            관리자가 등록한 정보입니다. 실제 가입 전 제공 업체의 최신 요금과
-            조건을 확인해주세요.
+            관리자가 등록한 정보입니다. 실제 가입 전 제공 업체의 최신 요금과 조건을 확인해주세요.
           </p>
         </section>
       )}

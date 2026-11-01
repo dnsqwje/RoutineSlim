@@ -1,25 +1,18 @@
 import React from "react";
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-  cleanup,
-  within,
-} from "@testing-library/react";
-import { request } from "../api/apiClient";
+import { render, screen, fireEvent, waitFor, cleanup, within } from "@testing-library/react";
+import { apiRequest } from "../api/apiClient";
 import SubscriptionEditor from "../features/subscriptions/components/SubscriptionEditor";
 import SavingsAnalysisPage from "../features/savings/SavingsAnalysisPage";
 import SubscriptionListPage from "../features/subscriptions/SubscriptionListPage";
 import { savingsAnalysis } from "../utils/subscriptionCalculations";
 vi.mock("../api/apiClient", () => ({
-  request: vi.fn(),
-  money: (n) => Number(n || 0).toLocaleString("ko-KR") + "원",
-  today: () => "2026-10-24",
+  apiRequest: vi.fn(),
+  formatWon: (n) => Number(n || 0).toLocaleString("ko-KR") + "원",
+  getTodayDate: () => "2026-10-24",
 }));
 afterEach(() => {
   cleanup();
-  request.mockReset();
+  apiRequest.mockReset();
   vi.restoreAllMocks();
 });
 it("monthly simulation counts yearly and weekly amounts and both video category labels", () => {
@@ -54,7 +47,7 @@ it("monthly simulation counts yearly and weekly amounts and both video category 
 });
 it("service selection sets name and category but saves the user entered price", async () => {
   const onSaved = vi.fn();
-  request.mockImplementation(async (path, options) =>
+  apiRequest.mockImplementation(async (path, options) =>
     options?.method === "POST"
       ? { id: 1, ...options.body }
       : [
@@ -117,7 +110,7 @@ it("duplicate filter and persisted review action update the savings simulation",
       status: "active",
     },
   ];
-  request.mockImplementation(async (path, options) => {
+  apiRequest.mockImplementation(async (path, options) => {
     if (path.includes("/catalog")) return [];
     if (options?.method === "PUT") {
       const id = Number(path.split("/").pop());
@@ -128,24 +121,23 @@ it("duplicate filter and persisted review action update the savings simulation",
   });
   render(<SavingsAnalysisPage />);
   await screen.findByText("디즈니플러스");
-  fireEvent.click(
-    screen.getByRole("button", { name: "중복 카테고리", exact: true }),
-  );
+  fireEvent.click(screen.getByRole("button", { name: "중복 카테고리", exact: true }));
   expect(screen.queryByText("Cloud")).toBeNull();
   fireEvent.click(
-    within(screen.getByText("디즈니플러스").closest("article")).getByRole("button",{name:"절약 검토",exact:true}),
+    within(screen.getByText("디즈니플러스").closest("article")).getByRole("button", {
+      name: "절약 검토",
+      exact: true,
+    }),
   );
   await screen.findByRole("button", { name: "검토 해제" });
-  expect(
-    screen.getByRole("img", { name: /검토 항목 제외 시 17,000원/ }),
-  ).toBeTruthy();
-  expect(request).toHaveBeenCalledWith("/api/v1/subscriptions/2", {
+  expect(screen.getByRole("img", { name: /검토 항목 제외 시 17,000원/ })).toBeTruthy();
+  expect(apiRequest).toHaveBeenCalledWith("/api/v1/subscriptions/2", {
     method: "PUT",
     body: expect.objectContaining({ status: "review" }),
   });
 });
 it("status filter isolates review rows while the database records remain intact", async () => {
-  request.mockImplementation(async (path) =>
+  apiRequest.mockImplementation(async (path) =>
     path.includes("/catalog")
       ? []
       : [
@@ -176,7 +168,5 @@ it("status filter isolates review rows while the database records remain intact"
   });
   expect(screen.queryByText("Active")).toBeNull();
   expect(screen.getByText("Review")).toBeTruthy();
-  expect(request.mock.calls.every(([, options]) => !options?.method)).toBe(
-    true,
-  );
+  expect(apiRequest.mock.calls.every(([, options]) => !options?.method)).toBe(true);
 });

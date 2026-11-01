@@ -4,6 +4,12 @@
 
 원본의 좌측 사이드바, 상단 영역, 넓은 대시보드·구독 표·차트·우측 패널, 색상·글꼴·반응형 배치를 그대로 사용합니다. 대시보드와 나머지 화면의 배치·스타일은 유지했습니다. 요청에 따라 로그인 화면의 가입·소셜 로그인 가용성은 첨부 앱의 실제 구현 상태에 맞췄습니다. 원본과 동일한 파일의 SHA-256은 `docs/PRESERVED-FILES.sha256`에 있습니다.
 
+## localhost:8080으로 확인하기
+
+백엔드 주소는 `http://localhost:8080` 그대로 유지합니다. 최종 웹도 같은 주소로 열려면 프론트의 `dist` 내용을 Spring의 `src/main/resources/static/`에 배치해 **Spring이 화면과 API를 함께 제공**하게 합니다. 정적 파일 허용 설정은 서버에서 확인해야 합니다.
+
+`8080용-빌드.bat`으로 빌드하거나 제공한 정적 배포 ZIP을 사용하세요. [8080 통합 배치 안내](docs/LOCALHOST-8080.md)에 정확한 위치와 실행 방법을 정리했습니다. 프론트 코드를 고치며 보는 개발 미리보기는 5173을 사용하고, 백엔드 8080 주소는 바꾸지 않습니다.
+
 ## Windows에서 실행
 
 1. Node.js **24.15.0(팀 기준, 24 LTS)을 일반 설치 프로그램으로 설치**합니다. Node.js ZIP을 풀어 그 안의 npm 폴더로 들어가는 방식은 사용하지 않아도 됩니다.
@@ -32,11 +38,11 @@ npm run dev
 
 ```dotenv
 API_PROXY_TARGET=http://localhost:8080
-VITE_API_MODE=original
+VITE_API_MODE=server-dev
 VITE_API_BASE_URL=
 ```
 
-기본값인 `original`은 현재 제공하는 웹 기능의 API 규격·세션 쿠키·CSRF 동작을 유지합니다. **첨부한 `RoutineSlim-Server-dev`는 이 원본 웹과 API 규격/기능이 다릅니다.** 서버 전체가 바로 호환되는 상태는 아닙니다.
+기본값은 `server-dev`입니다. 첨부 서버 규격으로 요청하며 `/api/csrf` 사전 요청을 하지 않습니다. 기존 쿠키 기반 웹 서버를 명시적으로 연결할 때만 `original`을 사용하며, 이 경우 필요한 CSRF 처리를 적용합니다. **첨부한 `RoutineSlim-Server-dev`는 이 원본 웹과 API 규격/기능이 다릅니다.** 서버 전체가 바로 호환되는 상태는 아닙니다.
 
 첨부 서버의 UUID 로그인과 구독 CRUD를 위한 `server-dev` 부분 연결 어댑터도 제공합니다. 사용하는 경우 `.env.server-dev.example`을 `.env.local`로 복사하고 실제 서버 카테고리 ID를 설정하세요. 첨부 서버의 보호 API 인증, 원본 전용 기능 API 등은 서버 측에서 완성이 필요합니다.
 
@@ -50,13 +56,21 @@ npm run build
 npm run preview
 ```
 
-- 변경된 가입·소셜 로그인 정책에 맞춰 테스트를 갱신했으며 전체 70개 테스트가 통과했습니다.
+- 변경된 가입·소셜 로그인 정책에 맞춰 테스트를 갱신했으며 전체 74개 테스트가 통과했습니다.
 - [화면 비교 및 검증 결과](docs/VALIDATION.md): 대시보드·구독 목록·추가 모달·모바일 화면은 원본을 유지하고, 로그인 화면은 요청한 인증 정책을 적용했습니다.
 - 모든 테스트는 모의 API를 사용하는 프론트 검증이며 실제 서버 통합 검증과는 다릅니다.
 - 빌드 결과는 `dist/`에 생성됩니다. 백엔드 폴더로 자동 복사하거나 기존 서버 파일을 삭제하지 않습니다.
 - 원본이 해시 라우팅(`#subscriptions` 등)을 사용하므로 별도의 React 라우터 서버는 필요하지 않습니다. `index.html`을 더블클릭하지 말고 HTTP 서버로 실행하세요.
 
 기본 시작 화면은 `src/main.jsx`의 React 웹입니다. 예전 가입·소셜 로그인 UI로 우회하지 않도록 사용하지 않는 `public/legacy/` 진입점은 제외했습니다.
+
+## 코드 이름 · 서식
+
+- API 요청: `apiRequest`, 원화 표시: `formatWon`, 날짜 키: `getTodayDate`
+- 서버 변환기: `serverApiAdapter.js`, 공통 통신: `routineSlimApiClient.js`
+- 서버가 요구하는 요청/응답 필드명은 그대로 유지합니다.
+- `npm run format`으로 서식을 정리하고 `npm run format:check`로 검사합니다.
+- 로그인 확인·사용자 구분·UUID 확인·관리자 표시 제한 등 실제 접근 검사는 유지합니다. 현재 서버 모드에 필요 없는 CSRF 요청과 중복 로그인 응답 검사를 정리했습니다.
 
 ## 변경 범위
 

@@ -20,7 +20,9 @@ if errorlevel 1 (
   pause
   exit /b 1
 )
-echo Starting RoutineSlim Web. Keep this window open.
+echo Starting development preview at http://localhost:5173
+echo Backend remains at http://localhost:8080
+echo For combined port 8080, use the static build instructions.
 call npm run dev -- --open
 if errorlevel 1 (
   echo Startup failed. Please copy the error message.

@@ -1,27 +1,21 @@
 import React from "react";
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-  cleanup,
-} from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
 import SpendingInsightsPage from "../features/reports/SpendingInsightsPage";
 import CommunityPage from "../features/community/CommunityPage";
 import PaymentHistoryPage from "../features/payments/PaymentHistoryPage";
-import { request } from "../api/apiClient";
+import { apiRequest } from "../api/apiClient";
 vi.mock("../api/apiClient", () => ({
-  request: vi.fn(),
-  money: (n) => Number(n || 0).toLocaleString("ko-KR") + "원",
-  today: () => "2026-10-24",
+  apiRequest: vi.fn(),
+  formatWon: (n) => Number(n || 0).toLocaleString("ko-KR") + "원",
+  getTodayDate: () => "2026-10-24",
 }));
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
-  request.mockReset();
+  apiRequest.mockReset();
 });
 it("weekly expenses use the same monthly conversion as the backend", async () => {
-  request.mockResolvedValue([
+  apiRequest.mockResolvedValue([
     { amount: 1200, cycle: "weekly", category: "음악", status: "active" },
     { amount: 12000, cycle: "yearly", category: "영상", status: "active" },
     { amount: 999, cycle: "monthly", category: "기타", status: "review" },
@@ -42,7 +36,7 @@ it("a new post draft survives viewing and editing an existing post", async () =>
     images: [],
     tags: [],
   };
-  request.mockImplementation(async (path, options) => {
+  apiRequest.mockImplementation(async (path, options) => {
     if (path === "/api/v1/community/posts") return [post];
     if (path.endsWith("/comments")) return [];
     if (path.endsWith("/likes/count")) return { likes: 0, liked: false };
@@ -59,9 +53,7 @@ it("a new post draft survives viewing and editing an existing post", async () =>
     target: { value: "Draft body" },
   });
   fireEvent.click(screen.getByRole("button", { name: /Existing/ }));
-  await waitFor(() =>
-    expect(screen.getByRole("button", { name: "수정" }).disabled).toBe(false),
-  );
+  await waitFor(() => expect(screen.getByRole("button", { name: "수정" }).disabled).toBe(false));
   fireEvent.click(screen.getByRole("button", { name: "수정" }));
   fireEvent.change(screen.getByLabelText("수정 제목"), {
     target: { value: "Updated" },
@@ -70,15 +62,13 @@ it("a new post draft survives viewing and editing an existing post", async () =>
   await screen.findByRole("heading", { name: "Updated" });
   fireEvent.click(screen.getByRole("button", { name: "← 목록으로" }));
   expect(screen.getByPlaceholderText("제목").value).toBe("My draft");
-  expect(screen.getByPlaceholderText("내용을 입력하세요").value).toBe(
-    "Draft body",
-  );
+  expect(screen.getByPlaceholderText("내용을 입력하세요").value).toBe("Draft body");
 });
 it("successful post creation is not reported as a failure when draft cache removal fails", async () => {
   vi.spyOn(Storage.prototype, "removeItem").mockImplementation(() => {
     throw Error("blocked");
   });
-  request.mockResolvedValue([]);
+  apiRequest.mockResolvedValue([]);
   render(<CommunityPage user="user" />);
   fireEvent.click(screen.getByRole("button", { name: /글쓰기/ }));
   fireEvent.change(screen.getByPlaceholderText("제목"), {
@@ -95,7 +85,7 @@ it("successful post creation is not reported as a failure when draft cache remov
 });
 it("new payments in a different month become visible after saving", async () => {
   let saved = false;
-  request.mockImplementation(async (path, options) => {
+  apiRequest.mockImplementation(async (path, options) => {
     if (options?.method === "POST") {
       saved = true;
       return { id: 1 };
@@ -123,13 +113,11 @@ it("new payments in a different month become visible after saving", async () => 
   });
   fireEvent.click(screen.getByRole("button", { name: "등록" }));
   await screen.findByText("January bill");
-  expect(request).toHaveBeenCalledWith("/api/v1/payments?month=2026-01");
+  expect(apiRequest).toHaveBeenCalledWith("/api/v1/payments?month=2026-01");
 });
 it("profile updates include detailed fields from the shared profile API", async () => {
-  const { default: ProfilePage } = await import(
-    "../features/account/ProfilePage"
-  );
-  request.mockImplementation(async (path, options) =>
+  const { default: ProfilePage } = await import("../features/account/ProfilePage");
+  apiRequest.mockImplementation(async (path, options) =>
     options?.method === "PUT"
       ? { id: "user", ...options.body }
       : {
@@ -150,7 +138,7 @@ it("profile updates include detailed fields from the shared profile API", async 
   });
   fireEvent.click(screen.getByRole("button", { name: "변경사항 저장" }));
   await screen.findByText("회원정보를 저장했습니다.");
-  expect(request).toHaveBeenCalledWith("/api/v1/members/me", {
+  expect(apiRequest).toHaveBeenCalledWith("/api/v1/members/me", {
     method: "PUT",
     body: {
       displayName: "Name",
@@ -168,21 +156,19 @@ it("operator reports can be marked resolved from settings", async () => {
     "../features/admin/components/CommunityReportModeration"
   );
   let resolved = false;
-  request.mockImplementation(async (path, options) => {
+  apiRequest.mockImplementation(async (path, options) => {
     if (path.endsWith("/moderation")) return { admin: true };
     if (options?.method === "POST") {
       resolved = true;
       return { status: "resolved" };
     }
-    return resolved
-      ? []
-      : [{ id: 3, postId: 1, reporterId: "reporter", reason: "spam" }];
+    return resolved ? [] : [{ id: 3, postId: 1, reporterId: "reporter", reason: "spam" }];
   });
   render(<CommunityReportModeration />);
   await screen.findByText("spam");
   fireEvent.click(screen.getByRole("button", { name: "처리 완료" }));
   await screen.findByText("처리할 신고가 없습니다.");
-  expect(request).toHaveBeenCalledWith("/api/v1/community/reports/3/resolve", {
+  expect(apiRequest).toHaveBeenCalledWith("/api/v1/community/reports/3/resolve", {
     method: "POST",
   });
 });

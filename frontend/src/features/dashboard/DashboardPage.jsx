@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { request, money, today } from "../../api/apiClient";
+import { apiRequest, formatWon, getTodayDate } from "../../api/apiClient";
 import ServiceBadge from "../../components/common/ServiceBadge";
 import MonthlySpendingChart from "../../components/charts/MonthlySpendingChart";
 export default function DashboardPage({ navigate }) {
@@ -8,10 +8,10 @@ export default function DashboardPage({ navigate }) {
   useEffect(() => {
     let active = true;
     Promise.all([
-      request("/api/v1/expenses/summary"),
-      request("/api/v1/savings/summary"),
-      request("/api/v1/subscriptions"),
-      request("/api/v1/reports/monthly?month=" + today().slice(0, 7)),
+      apiRequest("/api/v1/expenses/summary"),
+      apiRequest("/api/v1/savings/summary"),
+      apiRequest("/api/v1/subscriptions"),
+      apiRequest("/api/v1/reports/monthly?month=" + getTodayDate().slice(0, 7)),
     ])
       .then(([expense, savings, subscriptions, report]) => {
         if (active)
@@ -54,14 +54,14 @@ export default function DashboardPage({ navigate }) {
               <span>
                 월 예상 구독료 <i>₩</i>
               </span>
-              <strong>{money(data.expense.monthlyTotal)}</strong>
+              <strong>{formatWon(data.expense.monthlyTotal)}</strong>
               <small>등록한 구독의 월 환산 금액</small>
             </article>
             <article className="stat">
               <span>
                 연간 예상 구독료 <i>↗</i>
               </span>
-              <strong>{money(data.expense.annualTotal)}</strong>
+              <strong>{formatWon(data.expense.annualTotal)}</strong>
               <small>한 해의 고정비를 미리 확인해요</small>
             </article>
             <article className="stat">
@@ -75,20 +75,16 @@ export default function DashboardPage({ navigate }) {
               <span>
                 연간 절약 가능 금액 <i>✦</i>
               </span>
-              <strong>{money(data.savings.annualPotentialSavings)}</strong>
+              <strong>{formatWon(data.savings.annualPotentialSavings)}</strong>
               <small>절약 검토 구독 기준 예상액</small>
             </article>
           </div>
           <section className="panel">
             <div className="panel-heading">
               <h2>
-                내 구독 서비스{" "}
-                <span className="count-chip">{data.subscriptions.length}</span>
+                내 구독 서비스 <span className="count-chip">{data.subscriptions.length}</span>
               </h2>
-              <button
-                className="text-action"
-                onClick={() => navigate("subscriptions")}
-              >
+              <button className="text-action" onClick={() => navigate("subscriptions")}>
                 전체 관리 →
               </button>
             </div>
@@ -115,21 +111,14 @@ export default function DashboardPage({ navigate }) {
                       </td>
                       <td>{x.category}</td>
                       <td>
-                        {x.cycle === "yearly"
-                          ? "매년"
-                          : x.cycle === "weekly"
-                            ? "매주"
-                            : "매월"}
+                        {x.cycle === "yearly" ? "매년" : x.cycle === "weekly" ? "매주" : "매월"}
                       </td>
                       <td>
-                        <b>{money(x.amount)}</b>
+                        <b>{formatWon(x.amount)}</b>
                       </td>
                       <td>
                         <span
-                          className={
-                            "status-pill " +
-                            (x.status === "review" ? "review" : "active")
-                          }
+                          className={"status-pill " + (x.status === "review" ? "review" : "active")}
                         >
                           {x.status === "review" ? "절약 검토" : "이용 중"}
                         </span>
@@ -152,10 +141,7 @@ export default function DashboardPage({ navigate }) {
                 <span>▦</span>
                 <h3>첫 구독을 등록해보세요</h3>
                 <p>서비스를 추가하면 지출 분석이 여기에 표시됩니다.</p>
-                <button
-                  className="secondary"
-                  onClick={() => navigate("subscriptions")}
-                >
+                <button className="secondary" onClick={() => navigate("subscriptions")}>
                   구독 관리하기
                 </button>
               </div>
@@ -164,17 +150,12 @@ export default function DashboardPage({ navigate }) {
           <section className="panel">
             <div className="panel-heading">
               <h2>월별 실제 지출</h2>
-              <button
-                className="text-action"
-                onClick={() => navigate("monthly")}
-              >
+              <button className="text-action" onClick={() => navigate("monthly")}>
                 월간 결산 보기 →
               </button>
             </div>
             <MonthlySpendingChart
-              history={
-                Array.isArray(data.report?.history) ? data.report.history : []
-              }
+              history={Array.isArray(data.report?.history) ? data.report.history : []}
             />
           </section>
 

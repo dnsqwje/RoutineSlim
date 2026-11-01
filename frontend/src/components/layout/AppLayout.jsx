@@ -226,8 +226,7 @@ export default function AppLayout({
           {navigation
             .filter(
               (n) =>
-                ["activity", "support", "about"].includes(n.key) ||
-                (admin && n.key === "admin"),
+                ["activity", "support", "about"].includes(n.key) || (admin && n.key === "admin"),
             )
             .map((n) => (
               <button
@@ -286,9 +285,7 @@ export default function AppLayout({
             >
               <Icon name="bell" size={17} />
               {unread > 0 && (
-                <span className="feature-unread-badge">
-                  {unread > 99 ? "99+" : unread}
-                </span>
+                <span className="feature-unread-badge">{unread > 99 ? "99+" : unread}</span>
               )}
             </button>
             <button
@@ -314,11 +311,7 @@ export default function AppLayout({
             (page === "community" ? (
               <CommunitySidebar navigate={setPage} />
             ) : (
-              <SpendingSummaryPanel
-                page={page}
-                user={user}
-                navigate={setPage}
-              />
+              <SpendingSummaryPanel page={page} user={user} navigate={setPage} />
             ))}
         </div>
       </main>

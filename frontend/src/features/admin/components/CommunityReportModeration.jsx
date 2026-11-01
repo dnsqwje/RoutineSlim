@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { request } from "../../../api/apiClient";
+import { apiRequest } from "../../../api/apiClient";
 export default function CommunityReportModeration() {
   const [admin, setAdmin] = useState(false),
     [items, setItems] = useState([]),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
   async function load() {
-    setItems(await request("/api/v1/community/reports"));
+    setItems(await apiRequest("/api/v1/community/reports"));
   }
   useEffect(() => {
     let active = true;
-    request("/api/v1/community/moderation")
+    apiRequest("/api/v1/community/moderation")
       .then(async (value) => {
         if (active && value.admin) {
           setAdmin(true);
           try {
-            const reports = await request("/api/v1/community/reports");
+            const reports = await apiRequest("/api/v1/community/reports");
             if (active) setItems(reports);
           } catch (e) {
             if (active) setError(e.message);
@@ -31,7 +31,7 @@ export default function CommunityReportModeration() {
     setBusy(true);
     setError("");
     try {
-      await request(`/api/v1/community/reports/${report.id}/resolve`, {
+      await apiRequest(`/api/v1/community/reports/${report.id}/resolve`, {
         method: "POST",
       });
       await load();
@@ -46,7 +46,7 @@ export default function CommunityReportModeration() {
     setBusy(true);
     setError("");
     try {
-      await request(`/api/v1/community/moderation/posts/${report.postId}`, {
+      await apiRequest(`/api/v1/community/moderation/posts/${report.postId}`, {
         method: "DELETE",
       });
       await load();
@@ -73,18 +73,10 @@ export default function CommunityReportModeration() {
               <p>{report.reason}</p>
               <p className="muted">신고자: {report.reporterId}</p>
             </div>
-            <button
-              className="secondary small"
-              disabled={busy}
-              onClick={() => resolve(report)}
-            >
+            <button className="secondary small" disabled={busy} onClick={() => resolve(report)}>
               처리 완료
             </button>
-            <button
-              className="danger small"
-              disabled={busy}
-              onClick={() => remove(report)}
-            >
+            <button className="danger small" disabled={busy} onClick={() => remove(report)}>
               게시글 삭제
             </button>
           </div>

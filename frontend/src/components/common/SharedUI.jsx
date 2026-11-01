@@ -24,22 +24,13 @@ export function Status({ resource }) {
   );
 }
 export function Empty({ children }) {
-  return (
-    <p className="feature-empty">
-      {children || "아직 등록된 항목이 없습니다."}
-    </p>
-  );
+  return <p className="feature-empty">{children || "아직 등록된 항목이 없습니다."}</p>;
 }
 export function Tabs({ values, value, onChange }) {
   return (
     <div className="feature-tabs" role="group">
       {values.map(([key, label]) => (
-        <button
-          type="button"
-          key={key}
-          aria-pressed={value === key}
-          onClick={() => onChange(key)}
-        >
+        <button type="button" key={key} aria-pressed={value === key} onClick={() => onChange(key)}>
           {label}
         </button>
       ))}
@@ -109,12 +100,7 @@ export function Modal({ title, onClose, error, children }) {
       >
         <div className="feature-modal-heading">
           <h2>{title}</h2>
-          <button
-            type="button"
-            className="secondary small"
-            aria-label="닫기"
-            onClick={onClose}
-          >
+          <button type="button" className="secondary small" aria-label="닫기" onClick={onClose}>
             ×
           </button>
         </div>
@@ -140,12 +126,7 @@ export function Field({ label, children }) {
 export function FormActions({ busy, onCancel, label = "저장" }) {
   return (
     <div className="feature-form-actions">
-      <button
-        type="button"
-        className="secondary"
-        disabled={busy}
-        onClick={onCancel}
-      >
+      <button type="button" className="secondary" disabled={busy} onClick={onCancel}>
         취소
       </button>
       <button className="primary" disabled={busy}>

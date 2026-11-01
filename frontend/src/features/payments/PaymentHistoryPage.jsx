@@ -1,12 +1,12 @@
 import MonthlySpendingChart from "../../components/charts/MonthlySpendingChart";
 import { exportCsv } from "../../utils/csvExport";
 import React, { useEffect, useState, useRef } from "react";
-import { request, money, today } from "../../api/apiClient";
+import { apiRequest, formatWon, getTodayDate } from "../../api/apiClient";
 export default function PaymentHistoryPage() {
   const loadVersion = useRef(0);
   const [subscriptions, setSubscriptions] = useState([]);
   useEffect(() => {
-    request("/api/v1/subscriptions")
+    apiRequest("/api/v1/subscriptions")
       .then(setSubscriptions)
       .catch((e) => setError(e.message));
   }, []);
@@ -14,16 +14,16 @@ export default function PaymentHistoryPage() {
   const [editing, setEditing] = useState(null),
     [busy, setBusy] = useState(false),
     [subscriptionId, setSubscriptionId] = useState(null),
-    [month, setMonth] = useState(today().slice(0, 7)),
+    [month, setMonth] = useState(getTodayDate().slice(0, 7)),
     [items, setItems] = useState([]),
     [description, setDescription] = useState(""),
     [amount, setAmount] = useState(""),
-    [paidOn, setPaidOn] = useState(today()),
+    [paidOn, setPaidOn] = useState(getTodayDate()),
     [error, setError] = useState("");
   useEffect(() => {
     let active = true;
     setReport(null);
-    request("/api/v1/reports/monthly?month=" + month)
+    apiRequest("/api/v1/reports/monthly?month=" + month)
       .then((value) => {
         if (active) setReport(value);
       })
@@ -35,9 +35,7 @@ export default function PaymentHistoryPage() {
   async function load() {
     const version = ++loadVersion.current;
     try {
-      const rows = await request(
-        "/api/v1/payments?month=" + encodeURIComponent(month),
-      );
+      const rows = await apiRequest("/api/v1/payments?month=" + encodeURIComponent(month));
       if (version === loadVersion.current) {
         setItems(rows);
         setError("");
@@ -57,7 +55,7 @@ export default function PaymentHistoryPage() {
     if (busy) return;
     setBusy(true);
     try {
-      await request("/api/v1/payments" + (editing ? "/" + editing : ""), {
+      await apiRequest("/api/v1/payments" + (editing ? "/" + editing : ""), {
         method: editing ? "PUT" : "POST",
         body: { subscriptionId, description, amount: Number(amount), paidOn },
       });
@@ -76,7 +74,7 @@ export default function PaymentHistoryPage() {
   async function remove(id) {
     if (!confirm("결제 내역을 삭제할까요?")) return;
     try {
-      await request("/api/v1/payments/" + id, { method: "DELETE" });
+      await apiRequest("/api/v1/payments/" + id, { method: "DELETE" });
       await load();
     } catch (e) {
       setError(e.message);
@@ -91,7 +89,7 @@ export default function PaymentHistoryPage() {
       <div className="stats budget-stats">
         <article className="stat">
           <span>선택 월 실제 지출</span>
-          <strong>{money(items.reduce((sum, x) => sum + x.amount, 0))}</strong>
+          <strong>{formatWon(items.reduce((sum, x) => sum + x.amount, 0))}</strong>
         </article>
         <article className="stat">
           <span>결제 기록</span>
@@ -107,9 +105,7 @@ export default function PaymentHistoryPage() {
           <h2>월별 지출 추이</h2>
           <span className="muted">최근 6개월</span>
         </div>
-        <MonthlySpendingChart
-          history={Array.isArray(report?.history) ? report.history : []}
-        />
+        <MonthlySpendingChart history={Array.isArray(report?.history) ? report.history : []} />
       </section>
       {error && (
         <p className="error" role="alert">
@@ -124,11 +120,7 @@ export default function PaymentHistoryPage() {
             <select
               aria-label="연결할 구독"
               value={subscriptionId || ""}
-              onChange={(e) =>
-                setSubscriptionId(
-                  e.target.value ? Number(e.target.value) : null,
-                )
-              }
+              onChange={(e) => setSubscriptionId(e.target.value ? Number(e.target.value) : null)}
             >
               <option value="">연결 안 함</option>
               {subscriptions.map((s) => (
@@ -190,7 +182,7 @@ export default function PaymentHistoryPage() {
       </div>
       <div className="panel">
         <div className="panel-heading">
-          <h2>월별 내역 · {money(items.reduce((n, x) => n + x.amount, 0))}</h2>
+          <h2>월별 내역 · {formatWon(items.reduce((n, x) => n + x.amount, 0))}</h2>
           <div className="panel-tools">
             <button
               className="secondary small"
@@ -205,11 +197,7 @@ export default function PaymentHistoryPage() {
             >
               CSV 내보내기
             </button>
-            <input
-              type="month"
-              value={month}
-              onChange={(e) => setMonth(e.target.value)}
-            />
+            <input type="month" value={month} onChange={(e) => setMonth(e.target.value)} />
           </div>
         </div>
         {items.length ? (
@@ -219,7 +207,7 @@ export default function PaymentHistoryPage() {
                 <b>{x.description}</b>
                 <p className="muted">{x.paidOn}</p>
               </div>
-              <strong>{money(x.amount)}</strong>
+              <strong>{formatWon(x.amount)}</strong>
               <button
                 className="secondary small"
                 disabled={busy}
@@ -233,11 +221,7 @@ export default function PaymentHistoryPage() {
               >
                 수정
               </button>
-              <button
-                className="danger small"
-                disabled={busy}
-                onClick={() => remove(x.id)}
-              >
+              <button className="danger small" disabled={busy} onClick={() => remove(x.id)}>
                 삭제
               </button>
             </div>

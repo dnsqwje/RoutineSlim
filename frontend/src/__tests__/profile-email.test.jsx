@@ -1,14 +1,8 @@
 import React from "react";
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-  cleanup,
-} from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
 import ProfilePage from "../features/account/ProfilePage";
-import { request } from "../api/apiClient";
-vi.mock("../api/apiClient", () => ({ request: vi.fn() }));
+import { apiRequest } from "../api/apiClient";
+vi.mock("../api/apiClient", () => ({ apiRequest: vi.fn() }));
 afterEach(() => {
   cleanup();
   vi.resetAllMocks();
@@ -20,10 +14,9 @@ it("verifies the new email before replacing the profile email", async () => {
     email: "old@example.test",
     emailVerified: true,
   };
-  request.mockImplementation(async (path, options) => {
+  apiRequest.mockImplementation(async (path, options) => {
     if (path.endsWith("/email/send")) return { verificationId: "proof" };
-    if (path.endsWith("/email"))
-      return { ...profile, email: options.body.email };
+    if (path.endsWith("/email")) return { ...profile, email: options.body.email };
     return profile;
   });
   render(<ProfilePage />);
@@ -40,7 +33,7 @@ it("verifies the new email before replacing the profile email", async () => {
   });
   fireEvent.click(screen.getByText("이메일 변경 완료"));
   await waitFor(() =>
-    expect(request).toHaveBeenCalledWith("/api/v1/members/me/email", {
+    expect(apiRequest).toHaveBeenCalledWith("/api/v1/members/me/email", {
       method: "PUT",
       body: {
         email: "new@example.test",
@@ -50,13 +43,11 @@ it("verifies the new email before replacing the profile email", async () => {
       },
     }),
   );
-  await screen.findByText(
-    "이메일을 변경했습니다. 앞으로 계정 복구에 새 이메일을 사용하세요.",
-  );
+  await screen.findByText("이메일을 변경했습니다. 앞으로 계정 복구에 새 이메일을 사용하세요.");
   expect(screen.getByLabelText("이메일").value).toBe("new@example.test");
 });
 it("changing the recipient clears the previous verification challenge", async () => {
-  request
+  apiRequest
     .mockResolvedValueOnce({
       id: "member",
       emailVerified: true,

@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { request, today } from "../../../api/apiClient";
+import { apiRequest, getTodayDate } from "../../../api/apiClient";
 import { Modal } from "../../../components/common/SharedUI";
 import ServiceBadge from "../../../components/common/ServiceBadge";
 import { validateSubscription } from "../../../utils/validateSubscription";
-export default function SubscriptionEditor({
-  subscription = null,
-  onClose,
-  onSaved,
-}) {
+export default function SubscriptionEditor({ subscription = null, onClose, onSaved }) {
   const [form, setForm] = useState(() => ({
       name: "",
       category: "영상",
@@ -15,7 +11,7 @@ export default function SubscriptionEditor({
       cycle: "monthly",
       day: 1,
       status: "active",
-      billingAnchorDate: today(),
+      billingAnchorDate: getTodayDate(),
       ...subscription,
     })),
     [catalog, setCatalog] = useState([]),
@@ -23,7 +19,7 @@ export default function SubscriptionEditor({
     [busy, setBusy] = useState(false);
   useEffect(() => {
     let active = true;
-    request("/api/v1/catalog")
+    apiRequest("/api/v1/catalog")
       .then((rows) => {
         if (active) setCatalog(Array.isArray(rows) ? rows : []);
       })
@@ -58,7 +54,7 @@ export default function SubscriptionEditor({
     setBusy(true);
     setError("");
     try {
-      const saved = await request(
+      const saved = await apiRequest(
         "/api/v1/subscriptions" + (subscription ? "/" + subscription.id : ""),
         {
           method: subscription ? "PUT" : "POST",
@@ -74,7 +70,9 @@ export default function SubscriptionEditor({
         },
       );
       if (!saved || saved.id == null || saved.id === "")
-        throw new Error("서버의 저장 결과를 확인할 수 없습니다. 목록에서 반영 여부를 확인해주세요.");
+        throw new Error(
+          "서버의 저장 결과를 확인할 수 없습니다. 목록에서 반영 여부를 확인해주세요.",
+        );
       window.dispatchEvent(new Event("routineslim:subscriptions"));
       onSaved(saved);
     } catch (e) {
@@ -129,16 +127,10 @@ export default function SubscriptionEditor({
           />
         </label>
         <div className="service-preview editor-wide">
-          <ServiceBadge
-            name={form.name}
-            icon={chosen?.icon}
-            background={chosen?.background}
-          />
+          <ServiceBadge name={form.name} icon={chosen?.icon} background={chosen?.background} />
           <span>
             <b>{form.name || "직접 입력한 고정비"}</b>
-            <small>
-              {form.category} · 금액은 실제 결제 조건에 맞게 입력해주세요.
-            </small>
+            <small>{form.category} · 금액은 실제 결제 조건에 맞게 입력해주세요.</small>
           </span>
         </div>
         <label>
@@ -166,10 +158,7 @@ export default function SubscriptionEditor({
         </label>
         <label>
           결제 주기
-          <select
-            value={form.cycle}
-            onChange={(e) => setForm({ ...form, cycle: e.target.value })}
-          >
+          <select value={form.cycle} onChange={(e) => setForm({ ...form, cycle: e.target.value })}>
             <option value="monthly">매월</option>
             <option value="yearly">매년</option>
             <option value="weekly">매주</option>
@@ -191,10 +180,8 @@ export default function SubscriptionEditor({
           <input
             required
             type="date"
-            value={form.billingAnchorDate || today()}
-            onChange={(e) =>
-              setForm({ ...form, billingAnchorDate: e.target.value })
-            }
+            value={form.billingAnchorDate || getTodayDate()}
+            onChange={(e) => setForm({ ...form, billingAnchorDate: e.target.value })}
           />
         </label>
         <label>
@@ -208,12 +195,7 @@ export default function SubscriptionEditor({
           </select>
         </label>
         <div className="feature-form-actions editor-wide">
-          <button
-            type="button"
-            className="secondary"
-            disabled={busy}
-            onClick={onClose}
-          >
+          <button type="button" className="secondary" disabled={busy} onClick={onClose}>
             취소
           </button>
           <button className="primary" disabled={busy}>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { request } from "../../../api/apiClient";
+import { apiRequest } from "../../../api/apiClient";
 export default function AccountDataBackup() {
   const [busy, setBusy] = useState(false),
     [message, setMessage] = useState(""),
@@ -8,15 +8,9 @@ export default function AccountDataBackup() {
     setBusy(true);
     setError("");
     try {
-      const subscriptions = await request("/api/v1/subscriptions");
+      const subscriptions = await apiRequest("/api/v1/subscriptions");
       const blob = new Blob(
-        [
-          JSON.stringify(
-            { format: "RoutineSlim", version: 1, subscriptions },
-            null,
-            2,
-          ),
-        ],
+        [JSON.stringify({ format: "RoutineSlim", version: 1, subscriptions }, null, 2)],
         { type: "application/json" },
       );
       const url = URL.createObjectURL(blob);
@@ -39,8 +33,7 @@ export default function AccountDataBackup() {
     setError("");
     setMessage("");
     try {
-      if (file.size > 1000000)
-        throw Error("백업 파일은 1MB 이하만 가능합니다.");
+      if (file.size > 1000000) throw Error("백업 파일은 1MB 이하만 가능합니다.");
       const data = JSON.parse(await file.text());
       const items = Array.isArray(data) ? data : data.subscriptions;
       if (
@@ -65,9 +58,8 @@ export default function AccountDataBackup() {
         )
       )
         throw Error("올바른 구독 백업 파일이 아닙니다.");
-      if (!confirm(`${items.length}개의 구독으로 현재 구독 목록을 교체할까요?`))
-        return;
-      await request("/api/data/subscriptions", {
+      if (!confirm(`${items.length}개의 구독으로 현재 구독 목록을 교체할까요?`)) return;
+      await apiRequest("/api/data/subscriptions", {
         method: "PUT",
         body: { json: JSON.stringify(items) },
       });
@@ -88,12 +80,7 @@ export default function AccountDataBackup() {
         </button>
         <label className="secondary">
           JSON 복원{" "}
-          <input
-            type="file"
-            accept=".json,application/json"
-            disabled={busy}
-            onChange={restore}
-          />
+          <input type="file" accept=".json,application/json" disabled={busy} onChange={restore} />
         </label>
       </div>
       {error && (

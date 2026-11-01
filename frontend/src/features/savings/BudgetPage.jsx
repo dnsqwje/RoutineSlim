@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAccountSetting } from "../../hooks/useAccountSetting";
-import { request, money, today } from "../../api/apiClient";
+import { apiRequest, formatWon, getTodayDate } from "../../api/apiClient";
 export default function BudgetPage({ user }) {
   const setting = useAccountSetting(user, "budget", "");
   const budget = setting.value,
@@ -11,8 +11,8 @@ export default function BudgetPage({ user }) {
     [saved, setSaved] = useState(false);
   useEffect(() => {
     Promise.all([
-      request("/api/v1/expenses/summary"),
-      request("/api/v1/payments/summary?month=" + today().slice(0, 7)),
+      apiRequest("/api/v1/expenses/summary"),
+      apiRequest("/api/v1/payments/summary?month=" + getTodayDate().slice(0, 7)),
     ])
       .then(([expense, summary]) => {
         setExpense(expense);
@@ -25,11 +25,7 @@ export default function BudgetPage({ user }) {
     remaining = limit - spent;
   async function save(e) {
     e.preventDefault();
-    if (
-      !setting.ready ||
-      (budget !== "" && (!Number.isFinite(limit) || limit < 0))
-    )
-      return;
+    if (!setting.ready || (budget !== "" && (!Number.isFinite(limit) || limit < 0))) return;
     try {
       await setting.save();
       setSaved(true);
@@ -72,9 +68,7 @@ export default function BudgetPage({ user }) {
           </button>
         </form>
         {saved && <p role="status">계정에 예산을 저장했습니다.</p>}
-        <p className="muted">
-          예산은 계정에 저장되어 다른 기기에서도 확인할 수 있습니다.
-        </p>
+        <p className="muted">예산은 계정에 저장되어 다른 기기에서도 확인할 수 있습니다.</p>
       </div>
       {expense && (
         <div className="panel">
@@ -82,17 +76,15 @@ export default function BudgetPage({ user }) {
           <div className="stats budget-stats">
             <article className="stat">
               <span>월 예상 구독료</span>
-              <strong>{money(spent)}</strong>
+              <strong>{formatWon(spent)}</strong>
             </article>
             <article className="stat">
               <span>설정 예산</span>
-              <strong>{budget !== "" ? money(limit) : "미설정"}</strong>
+              <strong>{budget !== "" ? formatWon(limit) : "미설정"}</strong>
             </article>
             <article className="stat">
               <span>남은 예산</span>
-              <strong>
-                {budget !== "" ? money(Math.max(0, remaining)) : "-"}
-              </strong>
+              <strong>{budget !== "" ? formatWon(Math.max(0, remaining)) : "-"}</strong>
             </article>
           </div>
           {budget !== "" && (
@@ -104,8 +96,7 @@ export default function BudgetPage({ user }) {
               />
               {spent > limit ? (
                 <p className="error" role="alert">
-                  예산을 {money(spent - limit)} 초과했습니다. 불필요한 구독을
-                  검토해 보세요.
+                  예산을 {formatWon(spent - limit)} 초과했습니다. 불필요한 구독을 검토해 보세요.
                 </p>
               ) : (
                 <p className="muted">예산 내에서 구독을 관리하고 있습니다.</p>
@@ -117,12 +108,12 @@ export default function BudgetPage({ user }) {
       <div className="panel">
         <h2>이번 달 실제 지출</h2>
         <p>
-          <strong>{money(actual)}</strong>
+          <strong>{formatWon(actual)}</strong>
         </p>
         <p className="muted">직접 기록한 이번 달 결제 내역의 합계입니다.</p>
         {budget !== "" && actual > limit && (
           <p className="error" role="alert">
-            실제 지출이 예산을 {money(actual - limit)} 초과했습니다.
+            실제 지출이 예산을 {formatWon(actual - limit)} 초과했습니다.
           </p>
         )}
       </div>

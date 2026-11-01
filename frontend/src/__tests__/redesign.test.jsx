@@ -1,28 +1,22 @@
 import React from "react";
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-  cleanup,
-} from "@testing-library/react";
-import { request } from "../api/apiClient";
+import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
+import { apiRequest } from "../api/apiClient";
 import PaymentCalendarPage from "../features/payments/PaymentCalendarPage";
 import SubscriptionListPage from "../features/subscriptions/SubscriptionListPage";
 import LoginPage from "../features/auth/LoginPage";
 import CommunityPage from "../features/community/CommunityPage";
 vi.mock("../api/apiClient", () => ({
-  request: vi.fn(),
-  money: (n) => Number(n || 0).toLocaleString("ko-KR") + "원",
-  today: () => "2026-10-24",
+  apiRequest: vi.fn(),
+  formatWon: (n) => Number(n || 0).toLocaleString("ko-KR") + "원",
+  getTodayDate: () => "2026-10-24",
 }));
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
-  request.mockReset();
+  apiRequest.mockReset();
 });
 it("calendar date selection filters real events and month navigation reloads data", async () => {
-  request.mockResolvedValue([
+  apiRequest.mockResolvedValue([
     {
       subscriptionId: 1,
       name: "Music",
@@ -39,13 +33,11 @@ it("calendar date selection filters real events and month navigation reloads dat
   await screen.findByRole("heading", { name: "결제 예정 목록" });
   fireEvent.click(screen.getByRole("button", { name: "다음 달" }));
   await waitFor(() =>
-    expect(request).toHaveBeenCalledWith(
-      "/api/v1/calendar/events?year=2026&month=11",
-    ),
+    expect(apiRequest).toHaveBeenCalledWith("/api/v1/calendar/events?year=2026&month=11"),
   );
 });
 it("subscription table searches and opens details without changing records", async () => {
-  request.mockResolvedValue([
+  apiRequest.mockResolvedValue([
     {
       id: 1,
       name: "Music",
@@ -80,10 +72,10 @@ it("reference-inspired login preserves the desktop layout and omits unimplemente
   expect(screen.getByRole("heading", { name: /구독, 고정비를/ })).toBeTruthy();
   expect(screen.queryByRole("button", { name: "회원가입", exact: true })).toBeNull();
   expect(screen.queryByText("또는 간편 로그인")).toBeNull();
-  expect(request).not.toHaveBeenCalled();
+  expect(apiRequest).not.toHaveBeenCalled();
 });
 it("composer persists toolbar formatting through the existing post API", async () => {
-  request.mockResolvedValue([]);
+  apiRequest.mockResolvedValue([]);
   render(<CommunityPage user="user" />);
   fireEvent.click(screen.getByRole("button", { name: /글쓰기/ }));
   fireEvent.change(screen.getByPlaceholderText("제목"), {
@@ -96,7 +88,7 @@ it("composer persists toolbar formatting through the existing post API", async (
   expect(area.value).toBe("**Text**");
   fireEvent.click(screen.getByRole("button", { name: "글 작성" }));
   await waitFor(() =>
-    expect(request).toHaveBeenCalledWith("/api/v1/community/posts", {
+    expect(apiRequest).toHaveBeenCalledWith("/api/v1/community/posts", {
       method: "POST",
       body: {
         title: "Formatted post",
