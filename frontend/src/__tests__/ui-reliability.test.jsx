@@ -9,13 +9,13 @@ import {
   waitFor,
 } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
-import { Modal, Status } from "../components/common/SharedUI";
-import AppErrorBoundary from "../components/common/AppErrorBoundary";
-import { useApiResource } from "../hooks/useApiResource";
-import { apiRequest } from "../api/apiClient";
-import AppLayout from "../components/layout/AppLayout";
-import PaymentHistoryPage from "../features/payments/pages/PaymentHistoryPage";
-vi.mock("../api/apiClient", () => ({
+import { Modal, Status } from "../global/components/SharedUI";
+import AppErrorBoundary from "../global/components/AppErrorBoundary";
+import { useApiResource } from "../global/useApiResource";
+import { apiRequest } from "../global/api/apiClient";
+import AppLayout from "../global/components/AppLayout";
+import PaymentHistoryPage from "../domain/payment/PaymentHistoryPage";
+vi.mock("../global/api/apiClient", () => ({
   apiRequest: vi.fn(),
   formatWon: (n) => `${Number(n || 0).toLocaleString("ko-KR")}원`,
   getTodayDate: () => "2026-11-01",

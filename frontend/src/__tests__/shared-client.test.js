@@ -1,5 +1,8 @@
 import { afterEach, expect, it, vi } from "vitest";
-import { createRoutineSlimApiClient, RoutineSlimApiError } from "../shared/routineSlimApiClient";
+import {
+  createRoutineSlimApiClient,
+  RoutineSlimApiError,
+} from "../global/api/routineSlimApiClient";
 const MEMBER = "12345678-1234-1234-1234-123456789012";
 const SUB = "87654321-4321-4321-4321-210987654321";
 const ok = (value) => ({ ok: true, status: 200, text: async () => JSON.stringify(value) });

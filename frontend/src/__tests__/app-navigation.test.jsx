@@ -1,8 +1,8 @@
 import React from "react";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import App from "../App";
-import { apiRequest } from "../api/apiClient";
-vi.mock("../api/apiClient", () => ({
+import { apiRequest } from "../global/api/apiClient";
+vi.mock("../global/api/apiClient", () => ({
   apiRequest: vi.fn(),
   formatWon: (n) => Number(n || 0).toLocaleString("ko-KR") + "원",
   getTodayDate: () => "2026-10-24",

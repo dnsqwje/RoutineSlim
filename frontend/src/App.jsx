@@ -1,26 +1,31 @@
-import { LoginPage } from "./features/auth";
-import { DashboardPage } from "./features/dashboard";
-import {
-  SubscriptionListPage,
-  FreeTrialPage,
-  SubscriptionComparisonPage,
-  SubscriptionDetailPage,
-} from "./features/subscriptions";
-import { PaymentHistoryPage, PaymentCalendarPage } from "./features/payments";
-import { CommunityPage, CommunityActivityPage } from "./features/community";
-import { SavingsAnalysisPage, BudgetPage, SavingsGoalPage } from "./features/savings";
-import { ProfilePage } from "./features/account";
-import { SpendingInsightsPage, MonthlyReportPage } from "./features/reports";
-import { ReminderSettingsPage, NotificationCenterPage } from "./features/notifications";
-import { SupportCenterPage, AboutPage } from "./features/support";
-import { AdminPage } from "./features/admin";
-import * as authApi from "./features/auth/api/authApi";
-import * as adminApi from "./features/admin/api/adminApi";
-import * as notificationsApi from "./features/notifications/api/notificationsApi";
+import LoginPage from "./domain/auth/LoginPage";
+import DashboardPage from "./domain/stats/DashboardPage";
+import SubscriptionListPage from "./domain/subscription/SubscriptionListPage";
+import FreeTrialPage from "./domain/subscription/FreeTrialPage";
+import SubscriptionComparisonPage from "./domain/subscription/SubscriptionComparisonPage";
+import SubscriptionDetailPage from "./domain/subscription/SubscriptionDetailPage";
+import PaymentHistoryPage from "./domain/payment/PaymentHistoryPage";
+import PaymentCalendarPage from "./domain/payment/PaymentCalendarPage";
+import CommunityPage from "./domain/community/CommunityPage";
+import CommunityActivityPage from "./domain/community/CommunityActivityPage";
+import SavingsAnalysisPage from "./domain/stats/SavingsAnalysisPage";
+import BudgetPage from "./domain/stats/BudgetPage";
+import SavingsGoalPage from "./domain/stats/SavingsGoalPage";
+import ProfilePage from "./domain/user/ProfilePage";
+import SpendingInsightsPage from "./domain/stats/SpendingInsightsPage";
+import MonthlyReportPage from "./domain/stats/MonthlyReportPage";
+import ReminderSettingsPage from "./domain/user/ReminderSettingsPage";
+import NotificationCenterPage from "./domain/user/NotificationCenterPage";
+import SupportCenterPage from "./domain/support/SupportCenterPage";
+import AboutPage from "./domain/support/AboutPage";
+import AdminPage from "./domain/admin/AdminPage";
+import * as authApi from "./domain/auth/authApi";
+import * as adminApi from "./domain/admin/adminApi";
+import * as notificationsApi from "./domain/user/notificationsApi";
 import React, { useEffect, useState } from "react";
 
-import AppLayout from "./components/layout/AppLayout";
-import BrandLogo from "./components/common/BrandLogo";
+import AppLayout from "./global/components/AppLayout";
+import BrandLogo from "./global/components/BrandLogo";
 const keys = new Set([
   "dashboard",
   "subscriptions",

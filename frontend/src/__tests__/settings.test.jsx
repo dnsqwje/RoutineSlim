@@ -1,7 +1,7 @@
 import { act, renderHook, waitFor, cleanup } from "@testing-library/react";
-import { useAccountSetting } from "../features/account/hooks/useAccountSetting";
-import { apiRequest } from "../api/apiClient";
-vi.mock("../api/apiClient", () => ({ apiRequest: vi.fn() }));
+import { useAccountSetting } from "../domain/user/useAccountSetting";
+import { apiRequest } from "../global/api/apiClient";
+vi.mock("../global/api/apiClient", () => ({ apiRequest: vi.fn() }));
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();

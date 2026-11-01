@@ -1,18 +1,18 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor, cleanup, within } from "@testing-library/react";
-import FreeTrialPage from "../features/subscriptions/pages/FreeTrialPage";
-import MonthlyReportPage from "../features/reports/pages/MonthlyReportPage";
-import SubscriptionComparisonPage from "../features/subscriptions/pages/SubscriptionComparisonPage";
-import SavingsGoalPage from "../features/savings/pages/SavingsGoalPage";
-import SupportCenterPage from "../features/support/pages/SupportCenterPage";
-import CommunityActivityPage from "../features/community/pages/CommunityActivityPage";
-import NotificationCenterPage from "../features/notifications/pages/NotificationCenterPage";
-import SubscriptionDetailPage from "../features/subscriptions/pages/SubscriptionDetailPage";
+import FreeTrialPage from "../domain/subscription/FreeTrialPage";
+import MonthlyReportPage from "../domain/stats/MonthlyReportPage";
+import SubscriptionComparisonPage from "../domain/subscription/SubscriptionComparisonPage";
+import SavingsGoalPage from "../domain/stats/SavingsGoalPage";
+import SupportCenterPage from "../domain/support/SupportCenterPage";
+import CommunityActivityPage from "../domain/community/CommunityActivityPage";
+import NotificationCenterPage from "../domain/user/NotificationCenterPage";
+import SubscriptionDetailPage from "../domain/subscription/SubscriptionDetailPage";
 import App from "../App";
-import AdminPage from "../features/admin/pages/AdminPage";
-import BrandLogo from "../components/common/BrandLogo";
-import { apiRequest } from "../api/apiClient";
-vi.mock("../api/apiClient", () => ({
+import AdminPage from "../domain/admin/AdminPage";
+import BrandLogo from "../global/components/BrandLogo";
+import { apiRequest } from "../global/api/apiClient";
+vi.mock("../global/api/apiClient", () => ({
   apiRequest: vi.fn(),
   formatWon: (n) => Number(n || 0).toLocaleString("ko-KR") + "원",
   getTodayDate: () => "2026-10-24",

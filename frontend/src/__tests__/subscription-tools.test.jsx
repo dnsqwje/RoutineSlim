@@ -1,11 +1,11 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor, cleanup, within } from "@testing-library/react";
-import { apiRequest } from "../api/apiClient";
-import SubscriptionEditor from "../features/subscriptions/components/SubscriptionEditor";
-import SavingsAnalysisPage from "../features/savings/pages/SavingsAnalysisPage";
-import SubscriptionListPage from "../features/subscriptions/pages/SubscriptionListPage";
-import { savingsAnalysis } from "../features/subscriptions/utils/subscriptionCalculations";
-vi.mock("../api/apiClient", () => ({
+import { apiRequest } from "../global/api/apiClient";
+import SubscriptionEditor from "../domain/subscription/SubscriptionEditor";
+import SavingsAnalysisPage from "../domain/stats/SavingsAnalysisPage";
+import SubscriptionListPage from "../domain/subscription/SubscriptionListPage";
+import { savingsAnalysis } from "../domain/subscription/subscriptionCalculations";
+vi.mock("../global/api/apiClient", () => ({
   apiRequest: vi.fn(),
   formatWon: (n) => Number(n || 0).toLocaleString("ko-KR") + "원",
   getTodayDate: () => "2026-10-24",

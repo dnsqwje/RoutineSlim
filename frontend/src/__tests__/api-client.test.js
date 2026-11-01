@@ -44,7 +44,7 @@ afterEach(() => {
 });
 async function api(mode = "original") {
   vi.stubEnv("VITE_API_MODE", mode);
-  return (await import("../api/apiClient")).apiRequest;
+  return (await import("../global/api/apiClient")).apiRequest;
 }
 async function server() {
   const apiRequest = await api("server-dev");
@@ -211,7 +211,7 @@ describe("optional Server-dev bridge", () => {
 describe("server configuration defaults", () => {
   it("uses the supplied server protocol without a CSRF preflight by default", async () => {
     vi.stubEnv("VITE_API_MODE", "");
-    const { apiRequest } = await import("../api/apiClient");
+    const { apiRequest } = await import("../global/api/apiClient");
     fetchMock.mockResolvedValueOnce(response(MEMBER));
     await expect(
       apiRequest("/api/login", { method: "POST", body: { id: "tester", password: "not-stored" } }),
@@ -221,7 +221,7 @@ describe("server configuration defaults", () => {
   });
   it("rejects an unknown API mode instead of silently choosing an authentication flow", async () => {
     vi.stubEnv("VITE_API_MODE", "unknown");
-    const { apiRequest } = await import("../api/apiClient");
+    const { apiRequest } = await import("../global/api/apiClient");
     await expect(apiRequest("/api/login", { method: "POST" })).rejects.toThrow("VITE_API_MODE");
     expect(fetchMock).not.toHaveBeenCalled();
   });

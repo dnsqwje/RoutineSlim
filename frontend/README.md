@@ -9,7 +9,7 @@
 - [기능별 폴더 구조](docs/FRONTEND-STRUCTURE.md)
 - [백엔드에서 준비할 작업과 API](docs/BACKEND-TODO.md)
 
-화면은 각 기능의 `pages`, API 요청은 `api`, 전용 화면 조각은 `components`, 전용 훅과 계산은 `hooks`/`utils`로 정리했습니다. 앱 진입점은 각 기능의 `index.js`를 통해 화면을 가져옵니다.
+공통 코드는 `src/global`, 기능 코드는 `src/domain`에 모았습니다. 기능 안의 `pages`, `api`, `components`, `hooks`, `utils` 하위 폴더와 `index.js` 중계 파일은 제거했습니다. 회원정보·알림은 `user`, 대시보드·통계·절약은 `stats`로 묶어 `src` 하위 폴더를 53개에서 14개로 줄였습니다.
 
 ## localhost:8080으로 확인하기
 

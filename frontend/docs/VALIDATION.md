@@ -33,3 +33,9 @@
 - Spring ProblemDetail의 detail 설명과 HTTP 상태를 보존합니다.
 
 마지막으로 첨부한 세 ZIP이 이전 검토본과 바이트 단위로 동일함을 확인했습니다. 기능별 구조와 원본 기준은 BACKEND-TODO.md에 기록했습니다. 기본 서버 모드의 부분 조회 화면은 `screenshots/dashboard-partial.png`에서 확인할 수 있습니다.
+
+## 폴더 최소화
+
+공통 코드는 global, 기능 코드는 domain으로 정리했습니다. 기능 내부의 역할별 하위 폴더와 중계 index.js를 제거하고 관련 기능을 묶어 src 하위 폴더를 53개에서 14개로 줄였습니다. 화면·API·인증 정책·백엔드 주소는 유지합니다.
+
+최소화된 구조에서도 테스트 88개·프로덕션 빌드·서식 검사를 통과했습니다. CSS 번들 해시(index-tdkxbD3A.css)는 이전 빌드와 동일합니다.

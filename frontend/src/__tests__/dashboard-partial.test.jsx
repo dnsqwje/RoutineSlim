@@ -1,9 +1,9 @@
 import React from "react";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
-import DashboardPage from "../features/dashboard/pages/DashboardPage";
-import { apiRequest } from "../api/apiClient";
-vi.mock("../api/apiClient", () => ({
+import DashboardPage from "../domain/stats/DashboardPage";
+import { apiRequest } from "../global/api/apiClient";
+vi.mock("../global/api/apiClient", () => ({
   apiRequest: vi.fn(),
   formatWon: (n) => `${Number(n || 0).toLocaleString("ko-KR")}원`,
   getTodayDate: () => "2026-11-01",

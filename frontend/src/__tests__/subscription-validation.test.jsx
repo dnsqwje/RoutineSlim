@@ -1,9 +1,12 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
-import SubscriptionEditor from "../features/subscriptions/components/SubscriptionEditor";
-import { apiRequest } from "../api/apiClient";
-vi.mock("../api/apiClient", () => ({ apiRequest: vi.fn(), getTodayDate: () => "2026-11-01" }));
+import SubscriptionEditor from "../domain/subscription/SubscriptionEditor";
+import { apiRequest } from "../global/api/apiClient";
+vi.mock("../global/api/apiClient", () => ({
+  apiRequest: vi.fn(),
+  getTodayDate: () => "2026-11-01",
+}));
 afterEach(() => {
   cleanup();
   apiRequest.mockReset();

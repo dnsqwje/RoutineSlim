@@ -1,11 +1,11 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
-import { apiRequest } from "../api/apiClient";
-import PaymentCalendarPage from "../features/payments/pages/PaymentCalendarPage";
-import SubscriptionListPage from "../features/subscriptions/pages/SubscriptionListPage";
-import LoginPage from "../features/auth/pages/LoginPage";
-import CommunityPage from "../features/community/pages/CommunityPage";
-vi.mock("../api/apiClient", () => ({
+import { apiRequest } from "../global/api/apiClient";
+import PaymentCalendarPage from "../domain/payment/PaymentCalendarPage";
+import SubscriptionListPage from "../domain/subscription/SubscriptionListPage";
+import LoginPage from "../domain/auth/LoginPage";
+import CommunityPage from "../domain/community/CommunityPage";
+vi.mock("../global/api/apiClient", () => ({
   apiRequest: vi.fn(),
   formatWon: (n) => Number(n || 0).toLocaleString("ko-KR") + "원",
   getTodayDate: () => "2026-10-24",

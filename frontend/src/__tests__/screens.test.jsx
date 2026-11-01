@@ -1,10 +1,10 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
-import SpendingInsightsPage from "../features/reports/pages/SpendingInsightsPage";
-import CommunityPage from "../features/community/pages/CommunityPage";
-import PaymentHistoryPage from "../features/payments/pages/PaymentHistoryPage";
-import { apiRequest } from "../api/apiClient";
-vi.mock("../api/apiClient", () => ({
+import SpendingInsightsPage from "../domain/stats/SpendingInsightsPage";
+import CommunityPage from "../domain/community/CommunityPage";
+import PaymentHistoryPage from "../domain/payment/PaymentHistoryPage";
+import { apiRequest } from "../global/api/apiClient";
+vi.mock("../global/api/apiClient", () => ({
   apiRequest: vi.fn(),
   formatWon: (n) => Number(n || 0).toLocaleString("ko-KR") + "원",
   getTodayDate: () => "2026-10-24",
@@ -116,7 +116,7 @@ it("new payments in a different month become visible after saving", async () => 
   expect(apiRequest).toHaveBeenCalledWith("/api/v1/payments?month=2026-01");
 });
 it("profile updates include detailed fields from the shared profile API", async () => {
-  const { default: ProfilePage } = await import("../features/account/pages/ProfilePage");
+  const { default: ProfilePage } = await import("../domain/user/ProfilePage");
   apiRequest.mockImplementation(async (path, options) =>
     options?.method === "PUT"
       ? { id: "user", ...options.body }
@@ -153,7 +153,7 @@ it("profile updates include detailed fields from the shared profile API", async 
 });
 it("operator reports can be marked resolved from settings", async () => {
   const { default: CommunityReportModeration } = await import(
-    "../features/admin/components/CommunityReportModeration"
+    "../domain/admin/CommunityReportModeration"
   );
   let resolved = false;
   apiRequest.mockImplementation(async (path, options) => {

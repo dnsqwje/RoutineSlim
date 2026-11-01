@@ -1,8 +1,8 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
-import ProfilePage from "../features/account/pages/ProfilePage";
-import { apiRequest } from "../api/apiClient";
-vi.mock("../api/apiClient", () => ({ apiRequest: vi.fn() }));
+import ProfilePage from "../domain/user/ProfilePage";
+import { apiRequest } from "../global/api/apiClient";
+vi.mock("../global/api/apiClient", () => ({ apiRequest: vi.fn() }));
 afterEach(() => {
   cleanup();
   vi.resetAllMocks();
