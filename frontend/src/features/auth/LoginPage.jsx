@@ -1,50 +1,20 @@
 import BrandLogo from "../../components/common/BrandLogo";
 import "../../styles/login.css";
-import RegistrationPage from "./RegistrationPage";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { request } from "../../api/apiClient";
-export default function LoginPage({ onLogin, onRecover, onAbout, onSupport }) {
-  const [providers, setProviders] = useState({});
-  useEffect(() => {
-    request("/api/oauth/providers")
-      .then(setProviders)
-      .catch(() =>
-        setError(
-          "소셜 로그인 설정을 확인하지 못했습니다. 서버 연결을 확인해주세요.",
-        ),
-      );
-    if (new URLSearchParams(location.search).has("oauth_error"))
-      request("/api/oauth/error")
-        .then((value) => setError(value.message))
-        .catch(() =>
-          setError("소셜 로그인에 실패했습니다. 다시 시도해주세요."),
-        );
-  }, []);
+export default function LoginPage({ onLogin, onAbout, onSupport }) {
   const [rememberMe, setRememberMe] = useState(true);
   const [id, setId] = useState(""),
     [password, setPassword] = useState(""),
-    [register, setRegister] = useState(
-      () => new URLSearchParams(location.search).get("register") === "1",
-    ),
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
-  async function socialLogin(provider) {
-    setError("");
-    setBusy(true);
-    try {
-      const value = await request("/api/oauth/" + provider + "/start");
-      window.location.assign(value.authorizationUrl);
-    } catch (e) {
-      setError(e.message);
-      setBusy(false);
-    }
-  }
   async function submit(e) {
     e.preventDefault();
+    if (busy) return;
     setBusy(true);
     setError("");
     try {
-      const account = await request(register ? "/api/register" : "/api/login", {
+      const account = await request("/api/login", {
         method: "POST",
         body: { id, password, rememberMe },
       });
@@ -55,16 +25,6 @@ export default function LoginPage({ onLogin, onRecover, onAbout, onSupport }) {
       setBusy(false);
     }
   }
-  if (register)
-    return (
-      <RegistrationPage
-        onBack={() => {
-          setRegister(false);
-          setError("");
-          window.history.replaceState({}, "", window.location.pathname);
-        }}
-      />
-    );
   return (
     <div className="reference-auth">
       <header className="login-brandbar">
@@ -139,20 +99,6 @@ export default function LoginPage({ onLogin, onRecover, onAbout, onSupport }) {
           <p className="login-subtitle">
             RoutineSlim에 로그인하고 나만의 구독을 관리하세요.
           </p>
-          <div className="login-tabs">
-            <button className="selected" aria-label="로그인 탭" type="button">
-              로그인
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setRegister(true);
-                setError("");
-              }}
-            >
-              회원가입
-            </button>
-          </div>
           <form onSubmit={submit}>
             <label htmlFor="signin-id">
               이메일 또는 아이디 <em>*</em>
@@ -190,9 +136,6 @@ export default function LoginPage({ onLogin, onRecover, onAbout, onSupport }) {
                 />
                 로그인 상태 유지
               </label>
-              <button type="button" onClick={onRecover}>
-                비밀번호 찾기
-              </button>
             </div>
             {error && (
               <p className="login-error" role="alert">
@@ -203,37 +146,7 @@ export default function LoginPage({ onLogin, onRecover, onAbout, onSupport }) {
               {busy ? "로그인 중..." : "로그인"}
             </button>
           </form>
-          <div className="login-divider">또는 간편 로그인</div>
-          <div className="login-socials">
-            {Object.entries({
-              google: "Google",
-              naver: "네이버",
-              kakao: "카카오",
-            }).map(([key, label]) => (
-              <button
-                key={key}
-                type="button"
-                aria-label={label + " 로그인"}
-                disabled={busy}
-                onClick={() => socialLogin(key)}
-                title={
-                  providers[key]
-                    ? "소셜 로그인"
-                    : "개발자 키 설정 후 이용할 수 있습니다"
-                }
-              >
-                <b className={"social-" + key}>
-                  {key === "google" ? "G" : key === "naver" ? "N" : "●"}
-                </b>
-                {label}
-              </button>
-            ))}
-          </div>
-          <p className="login-social-note">
-            소셜 로그인은 개발자 키를 등록하면 활성화됩니다.
-          </p>
           <nav className="login-help">
-            <button onClick={onRecover}>아이디 · 비밀번호 찾기</button>
             <button onClick={onAbout}>서비스 소개</button>
             <button onClick={onSupport}>고객센터</button>
           </nav>

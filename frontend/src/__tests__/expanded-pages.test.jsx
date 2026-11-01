@@ -15,7 +15,7 @@ import SupportCenterPage from "../features/support/SupportCenterPage";
 import CommunityActivityPage from "../features/community/CommunityActivityPage";
 import NotificationCenterPage from "../features/notifications/NotificationCenterPage";
 import SubscriptionDetailPage from "../features/subscriptions/SubscriptionDetailPage";
-import AccountRecoveryPage from "../features/auth/AccountRecoveryPage";
+import App from "../App";
 import AdminPage from "../features/admin/AdminPage";
 import BrandLogo from "../components/common/BrandLogo";
 import { request } from "../api/apiClient";
@@ -227,27 +227,14 @@ it("subscription management notes are saved", async () => {
     body: { note: "Review later" },
   });
 });
-it("email code confirmation can display recovered account IDs", async () => {
-  request.mockImplementation(async (path) =>
-    path.endsWith("/start")
-      ? { requestId: "r1", message: "Sent" }
-      : { verified: true, ids: ["recovered_user"] },
-  );
-  render(<AccountRecoveryPage onBack={() => {}} />);
-  fireEvent.change(screen.getByLabelText("가입 시 인증한 이메일"), {
-    target: { value: "user@example.com" },
-  });
-  fireEvent.click(screen.getByRole("button", { name: "인증번호 발송" }));
-  await screen.findByLabelText("6자리 인증번호");
-  fireEvent.change(screen.getByLabelText("6자리 인증번호"), {
-    target: { value: "123456" },
-  });
-  fireEvent.click(screen.getByRole("button", { name: "인증 확인" }));
-  await screen.findByText("recovered_user");
-  expect(request).toHaveBeenCalledWith("/api/recovery/confirm", {
-    method: "POST",
-    body: { requestId: "r1", code: "123456" },
-  });
+it("old account recovery links return guests to ordinary login", async () => {
+  window.history.replaceState({}, "", "/#recovery");
+  request.mockRejectedValue(new Error("Unauthorized"));
+  render(<App />);
+  await screen.findByRole("heading", { name: "로그인", exact: true });
+  expect(screen.queryByLabelText("가입 시 인증한 이메일")).toBeNull();
+  expect(request.mock.calls.some(([path]) => path.startsWith("/api/recovery/"))).toBe(false);
+  window.history.replaceState({}, "", "/");
 });
 it("admin can create published content through the admin API", async () => {
   request.mockImplementation(async (path) =>

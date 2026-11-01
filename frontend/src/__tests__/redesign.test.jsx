@@ -75,27 +75,12 @@ it("subscription table searches and opens details without changing records", asy
   fireEvent.click(screen.getByRole("button", { name: "상세" }));
   expect(open).toHaveBeenCalledWith(1);
 });
-it("reference-inspired login still opens the improved consent signup", async () => {
-  request.mockImplementation(async (path) =>
-    path.endsWith("/policy")
-      ? {
-          termsVersion: "2026-10-24",
-          privacyVersion: "2026-10-24",
-          mailAvailable: true,
-          terms: "약관",
-          privacy: "개인정보",
-        }
-      : {},
-  );
+it("reference-inspired login preserves the desktop layout and omits unimplemented auth", () => {
   render(<LoginPage onLogin={() => {}} />);
   expect(screen.getByRole("heading", { name: /구독, 고정비를/ })).toBeTruthy();
-  fireEvent.click(
-    screen.getByRole("button", { name: "회원가입", exact: true }),
-  );
-  await screen.findByText("서비스 이용약관 동의 (필수)");
-  expect(screen.getByRole("button", { name: "동의하고 다음" }).disabled).toBe(
-    true,
-  );
+  expect(screen.queryByRole("button", { name: "회원가입", exact: true })).toBeNull();
+  expect(screen.queryByText("또는 간편 로그인")).toBeNull();
+  expect(request).not.toHaveBeenCalled();
 });
 it("composer persists toolbar formatting through the existing post API", async () => {
   request.mockResolvedValue([]);

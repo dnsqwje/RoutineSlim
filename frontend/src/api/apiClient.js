@@ -45,7 +45,7 @@ export async function request(path, options = {}) {
   if (!response.ok) {
     if (
       response.status === 401 &&
-      !["/api/login", "/api/register", "/api/me", "/api/csrf"].includes(path) &&
+      !["/api/login", "/api/me", "/api/csrf"].includes(path) &&
       typeof window !== "undefined"
     )
       window.dispatchEvent(new Event("routineslim:unauthorized"));

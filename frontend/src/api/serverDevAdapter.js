@@ -71,7 +71,6 @@ export async function requestServerDev(path, options = {}) {
   }
   if (path === '/api/me' && method === 'GET') return {id:signedInId()};
   if (path === '/api/logout' && method === 'POST') {clearSession(); return null;}
-  if (path === '/api/oauth/providers' && method === 'GET') return {google:false,naver:false,kakao:false};
   const match = path.match(/^\/api\/v1\/subscriptions(?:\/([a-zA-Z0-9-]+))?$/);
   if (match) {
     const id = match[1];

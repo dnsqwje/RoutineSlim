@@ -22,7 +22,6 @@ import SupportCenterPage from "./features/support/SupportCenterPage";
 import NotificationCenterPage from "./features/notifications/NotificationCenterPage";
 import SubscriptionDetailPage from "./features/subscriptions/SubscriptionDetailPage";
 import AboutPage from "./features/support/AboutPage";
-import AccountRecoveryPage from "./features/auth/AccountRecoveryPage";
 import AdminPage from "./features/admin/AdminPage";
 const keys = new Set([
   "dashboard",
@@ -44,7 +43,6 @@ const keys = new Set([
   "notifications",
   "subscription-detail",
   "about",
-  "recovery",
   "admin",
   "login",
 ]);
@@ -149,8 +147,6 @@ export default function App() {
   }
   if (loading) return <div className="loading">RoutineSlim 불러오는 중...</div>;
   if (!user) {
-    if (route.key === "recovery")
-      return <AccountRecoveryPage onBack={() => navigate("login")} />;
     if (route.key === "about" || route.key === "support")
       return (
         <div className="public-site">
@@ -183,7 +179,6 @@ export default function App() {
           setUser(id);
           navigate("dashboard");
         }}
-        onRecover={() => navigate("recovery")}
         onAbout={() => navigate("about")}
         onSupport={() => navigate("support")}
       />

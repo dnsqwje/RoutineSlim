@@ -10,53 +10,24 @@
   ],
   "/api/login": [
     "src/api/apiClient.js",
+    "src/api/serverDevAdapter.js",
     "src/features/auth/LoginPage.jsx"
   ],
   "/api/logout": [
-    "src/App.jsx"
+    "src/App.jsx",
+    "src/api/serverDevAdapter.js"
   ],
   "/api/me": [
     "src/App.jsx",
     "src/api/apiClient.js",
+    "src/api/serverDevAdapter.js",
     "src/features/account/ProfilePage.jsx"
-  ],
-  "/api/oauth/": [
-    "src/features/auth/LoginPage.jsx"
-  ],
-  "/api/oauth/error": [
-    "src/features/auth/LoginPage.jsx"
-  ],
-  "/api/oauth/providers": [
-    "src/features/auth/LoginPage.jsx"
   ],
   "/api/password": [
     "src/features/account/ProfilePage.jsx"
   ],
-  "/api/recovery/confirm": [
-    "src/features/auth/AccountRecoveryPage.jsx"
-  ],
-  "/api/recovery/reset": [
-    "src/features/auth/AccountRecoveryPage.jsx"
-  ],
-  "/api/recovery/start": [
-    "src/features/auth/AccountRecoveryPage.jsx"
-  ],
-  "/api/register": [
-    "src/api/apiClient.js",
-    "src/features/auth/LoginPage.jsx",
-    "src/features/auth/RegistrationPage.jsx"
-  ],
-  "/api/registration/email/send": [
-    "src/features/auth/RegistrationPage.jsx"
-  ],
-  "/api/registration/email/verify": [
-    "src/features/auth/RegistrationPage.jsx"
-  ],
-  "/api/registration/id-availability?id=": [
-    "src/features/auth/RegistrationPage.jsx"
-  ],
-  "/api/registration/policy": [
-    "src/features/auth/RegistrationPage.jsx"
+  "/api/v1/": [
+    "src/shared/routineSlimClient.js"
   ],
   "/api/v1/activity/me": [
     "src/features/community/CommunityActivityPage.jsx"
@@ -223,17 +194,27 @@
     "src/features/reports/SpendingInsightsPage.jsx",
     "src/features/savings/SavingsAnalysisPage.jsx",
     "src/features/subscriptions/SubscriptionListPage.jsx",
-    "src/features/subscriptions/components/SubscriptionEditor.jsx"
+    "src/features/subscriptions/components/SubscriptionEditor.jsx",
+    "src/shared/routineSlimClient.js"
+  ],
+  "/api/v1/subscriptions${status ? ": [
+    "src/shared/routineSlimClient.js"
   ],
   "/api/v1/subscriptions/": [
     "src/features/savings/SavingsAnalysisPage.jsx",
     "src/features/subscriptions/SubscriptionListPage.jsx"
+  ],
+  "/api/v1/subscriptions/${id}": [
+    "src/shared/routineSlimClient.js"
   ],
   "/api/v1/subscriptions/${id}/detail": [
     "src/features/subscriptions/SubscriptionDetailPage.jsx"
   ],
   "/api/v1/subscriptions/${id}/note": [
     "src/features/subscriptions/SubscriptionDetailPage.jsx"
+  ],
+  "/api/v1/subscriptions/scan": [
+    "src/shared/routineSlimClient.js"
   ],
   "/api/v1/support/": [
     "src/features/support/SupportCenterPage.jsx"
