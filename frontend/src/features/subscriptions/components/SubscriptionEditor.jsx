@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { request, today } from "../../../api/apiClient";
 import { Modal } from "../../../components/common/SharedUI";
 import ServiceBadge from "../../../components/common/ServiceBadge";
+import { validateSubscription } from "../../../utils/validateSubscription";
 export default function SubscriptionEditor({
   subscription = null,
   onClose,
@@ -49,6 +50,11 @@ export default function SubscriptionEditor({
   async function save(e) {
     e.preventDefault();
     if (busy) return;
+    const validationError = validateSubscription(form);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
     setBusy(true);
     setError("");
     try {
@@ -67,6 +73,8 @@ export default function SubscriptionEditor({
           },
         },
       );
+      if (!saved || saved.id == null || saved.id === "")
+        throw new Error("서버의 저장 결과를 확인할 수 없습니다. 목록에서 반영 여부를 확인해주세요.");
       window.dispatchEvent(new Event("routineslim:subscriptions"));
       onSaved(saved);
     } catch (e) {
@@ -115,7 +123,7 @@ export default function SubscriptionEditor({
           항목 이름
           <input
             required
-            maxLength={255}
+            maxLength={100}
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
           />
@@ -149,6 +157,8 @@ export default function SubscriptionEditor({
           <input
             type="number"
             min="0"
+            max="2147483647"
+            step="1"
             required
             value={form.amount}
             onChange={(e) => setForm({ ...form, amount: e.target.value })}
